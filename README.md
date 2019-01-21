@@ -3,10 +3,10 @@ Hanyang Univ.
 
 2019.1.21. dong's ver1.0
 ----
-너모 오래 걸려..
-tensorflow
-tensorflow-hub
-nltk
-numpy
+내 노트북에선 너모 오래 걸려..
 
-설치 바람
+install package list
+- tensorflow
+- tensorflow-hub
+- nltk
+- numpy
