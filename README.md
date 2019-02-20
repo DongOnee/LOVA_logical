@@ -14,6 +14,12 @@ Hanyang Univ.
 
 - src/models/py
   - 필요한 모델 생성하는 코드들
+  
+- src/logical.py
+  - 학습된 모델을 불러 들어와서 essay path 를 input 값으로 넣은후 점수 (0~1) 출력
+  - ```python logical.py -e sample1.txt -s 2```
+  - ```-e``` : essay file path
+  - ```-s``` : checkpoint global step number
 
 
 2019.1.21. dong's ver1.0
