@@ -10,3 +10,5 @@ install package list
 - tensorflow-hub
 - nltk
 - numpy
+
+https://github.com/Rushikesh8983/MastersDataScience_Deep-learning-project/blob/master/RD_Language%20translate.ipynb
