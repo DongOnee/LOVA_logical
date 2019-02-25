@@ -8,13 +8,13 @@ Hanyang Univ.
   - ```python logical_train -e 100 -s 5```
   - ```-e``` : epoch
   - ```-s``` : checkpoint global step number
-  
+
 - src/util.py
   - 필요한 함수들 모아둠
 
 - src/models/py
   - 필요한 모델 생성하는 코드들
-  
+
 - src/logical.py
   - 학습된 모델을 불러 들어와서 essay path 를 input 값으로 넣은후 점수 (0~1) 출력
   - ```python logical.py -e sample1.txt -s 2```
@@ -31,5 +31,6 @@ install package list
 - tensorflow-hub
 - nltk
 - numpy
+- pandas
 
 https://github.com/Rushikesh8983/MastersDataScience_Deep-learning-project/blob/master/RD_Language%20translate.ipynb
