@@ -2,7 +2,7 @@ import argparse
 import tensorflow as tf
 import numpy as np
 from utils import *
-from models_ver1_2 import *
+from models import *
 import time
 
 parser = argparse.ArgumentParser()
