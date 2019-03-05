@@ -5,7 +5,7 @@ Hanyang Univ.
 ----
 > batch size 를 placeholder 로 만들어서 실행시간을 좀더 짧게 만들었다.<br>
 > embedding 하는 함수를 따로 만들어서 tensor graph 와 분리시킨 후 embedding 결과를 feeding 하는 식으로 하였다 <br>
-> 거의 완성본이라고 생각해도 될거 같아.
+> 거의 완성본이라고 생각해도 될거 같다.
 - src/logical_train.py
   - training code 완성
   - ```python logical_train -e 100 -s 5```
