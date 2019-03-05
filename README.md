@@ -29,7 +29,7 @@ Hanyang Univ.
   - ```-s``` : checkpoint global step number
 
 
-2019.1.21. dong's ver1.0
+2019.2.2. dong's ver1.2
 ----
 - src/logical_train.py
   - training code 완성
