@@ -22,13 +22,16 @@ lstm_sizes = [1024, 256]
 batch_size = 5
 lr = 0.1
 
+# export_dir = "builder_save"
+# builder = tf.saved_model.builder.SavedModelBuilder(export_dir)
+
 print('#' * 5, "global_step     :", global_step)
 print('#' * 5, "epochs          :", epochs)
 print('#' * 5, "learning_rate   :", lr)
 print('#' * 5, "lstm_sizes      :", lstm_sizes)
 
 # data pre-processing
-train_essay, train_score, valid_essay, valid_score = get_data()
+train_essay, train_score, valid_essay, valid_score = get_data(20, 20)
 
 vector_essay_train, lengths_essay_train = embedding_parag(train_essay)
 train_score = train_score
@@ -36,6 +39,7 @@ vector_essay_valid, lengths_essay_valid = embedding_parag(valid_essay)
 valid_score = valid_score
 
 print("graph on")
+
 with tf.Graph().as_default():
     # modeling
     i, l, l_p, s, bs, kp = model_inputs()
@@ -86,6 +90,11 @@ with tf.Graph().as_default():
                           "Train Loss: {:.3f}...".format(loss_),
                           "Train Accruacy: {:.3f}...".format(np.mean(train_acc)),
                           "Val Loss: {:.3f}".format(val_loss))
-        saver.save(sess, "logic_models/dongs", global_step=global_step)
-
-
+        saver.save(sess, "logic_models/dongs",
+                   global_step=global_step)
+#         # tf.train.write_graph(sess.graph_def, './convertModels', 'saved_model.pbtxt', as_text=True)
+#         builder.add_meta_graph_and_variables(sess,
+#                                              [tf.saved_model.tag_constants.TRAINING],
+#                                              saver=saver,
+#                                              strip_default_attrs=True)
+# builder.save()

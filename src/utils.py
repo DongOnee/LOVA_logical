@@ -26,28 +26,23 @@ def get_nom_score(prompt_id, score):
 
 
 def get_data(train_len=-1, valid_len=-1, paths=[train_data_path, valid_data_path, valid_predic_path]):
-    pd_train = pd.read_csv(paths[0], sep='\t')
-    pd_valid_data = pd.read_csv(paths[1], sep='\t')
-    pd_valid_y = pd.read_csv(paths[2])
-    pd_valid = pd_valid_data.merge(pd_valid_y.rename(columns={'prediction_id':'domain1_predictionid'}))
+    pd_train = pd.read_csv(paths[0], sep='\t') if train_len == -1 else pd.read_csv(paths[0], sep='\t', nrows=train_len)
+    pd_valid_data = pd.read_csv(paths[1], sep='\t') if valid_len == -1 else pd.read_csv(paths[1], sep='\t', nrows=valid_len)
+    pd_valid_y = pd.read_csv(paths[2]) if valid_len == -1 else pd.read_csv(paths[2], nrows=valid_len)
+    pd_valid = pd_valid_data.merge(pd_valid_y.rename(columns={'prediction_id': 'domain1_predictionid'}))
 
-    if pd_train.shape[0] < train_len:
-        train_len = -1
-    if pd_valid.shape[0] < valid_len:
-        valid_len = -1
-
-    pd_train = pd_train[:train_len][['essay_set', 'essay', 'domain1_score']].rename(columns={'domain1_score':'score'}).sample(frac=1).reset_index(drop=True)
-    pd_valid = pd_valid[:valid_len][['essay_set', 'essay', 'predicted_score']].rename(columns={'predicted_score':'score'}).sample(frac=1).reset_index(drop=True)
+    pd_train = pd_train[['essay_set', 'essay', 'domain1_score']].rename(columns={'domain1_score': 'score'}).sample(frac=1).reset_index(drop=True)
+    pd_valid = pd_valid[['essay_set', 'essay', 'predicted_score']].rename(columns={'predicted_score': 'score'}).sample(frac=1).reset_index(drop=True)
 
     train_x = np.array(pd_train['essay'])
-    train_y = [ get_nom_score(p['essay_set'], p['score']) for _, p in pd_train.iterrows() ]
+    train_y = [get_nom_score(p['essay_set'], p['score']) for _, p in pd_train.iterrows()]
     valid_x = np.array(pd_valid['essay'])
-    valid_y = [ get_nom_score(p['essay_set'], p['score']) for _, p in pd_valid.iterrows() ]
+    valid_y = [get_nom_score(p['essay_set'], p['score']) for _, p in pd_valid.iterrows()]
 
-    train_x = [ sent_tokenize(pa) for pa in train_x]
-    train_y = [ [pa] for pa in train_y]
-    valid_x = [ sent_tokenize(pa) for pa in valid_x]
-    valid_y = [ [pa] for pa in valid_y]
+    train_x = [sent_tokenize(pa) for pa in train_x]
+    train_y = [[pa] for pa in train_y]
+    valid_x = [sent_tokenize(pa) for pa in valid_x]
+    valid_y = [[pa] for pa in valid_y]
 
     return train_x, train_y, valid_x, valid_y
 

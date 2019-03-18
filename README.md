@@ -1,6 +1,17 @@
 # LOVA_logical
 Hanyang Univ.
 
+2019.3.18. dong's ver2.2
+----
+
+- src/logical_train.py -> src/train.py
+    - 이름바꿈
+
+- src/util.py && src/embedding.py
+    - 기존에 있는 방법과 달리 바꿈
+
+전체적으로 변경사항이 거의 없는 상태이다. 다양한 방법을 이용하여 모델을 저장한후 tensorflow js 에서 불러 오려고 노력했지만 실패 하였다. 관련 결과는 구글 공유 드라이브에 작성해 두었다.
+
 2019.3.6. dong's ver2.1
 ----
 > batch size 를 placeholder 로 만들어서 실행시간을 좀더 짧게 만들었다.<br>
@@ -8,9 +19,9 @@ Hanyang Univ.
 > 거의 완성본이라고 생각해도 될거 같다.
 - src/logical_train.py
   - training code 완성
-  - ```python logical_train -e 100 -s 5```
-  - ```-e``` : epoch
-  - ```-s``` : checkpoint global step number
+  - `python logical_train -e 100 -s 5`
+  - `-e` : epoch
+  - `-s` : checkpoint global step number
 
 - src/util.py
   - 필요한 함수들 모아둠
@@ -24,18 +35,18 @@ Hanyang Univ.
 - src/logical.py
   - 학습된 모델을 불러 들어와서 essay path 를 input 값으로 넣은후 점수 (0~1) 출력
   - 소요 시간 출력
-  - ```python logical.py -e sample1.txt -s 2```
-  - ```-e``` : essay file path
-  - ```-s``` : checkpoint global step number
+  - `python logical.py -e sample1.txt -s 2`
+  - `-e` : essay file path
+  - `-s` : checkpoint global step number
 
 
 2019.2.2. dong's ver1.2
 ----
 - src/logical_train.py
   - training code 완성
-  - ```python logical_train -e 100 -s 5```
-  - ```-e``` : epoch
-  - ```-s``` : checkpoint global step number
+  - `python logical_train -e 100 -s 5`
+  - `-e` : epoch
+  - `-s` : checkpoint global step number
 
 - src/util.py
   - 필요한 함수들 모아둠
@@ -45,9 +56,9 @@ Hanyang Univ.
 
 - src/logical.py
   - 학습된 모델을 불러 들어와서 essay path 를 input 값으로 넣은후 점수 (0~1) 출력
-  - ```python logical.py -e sample1.txt -s 2```
-  - ```-e``` : essay file path
-  - ```-s``` : checkpoint global step number
+  - `python logical.py -e sample1.txt -s 2`
+  - `-e` : essay file path
+  - `-s` : checkpoint global step number
 
 
 2019.1.21. dong's ver1.0
@@ -55,10 +66,31 @@ Hanyang Univ.
 내 노트북에선 너모 오래 걸려..
 
 install package list
-- tensorflow
-- tensorflow-hub
-- nltk
-- numpy
-- pandas
+- tensorflow : `conda install -c conda-forge tensorflow`
+- tensorflow-hub : `conda install -c conda-forge tensorflow-hub`
+- nltk : `conda install -c conda-forge nltk`
+- numpy : `conda install -c conda-forge numpy`
+- pandas : `conda install -c conda-forge pandas`
 
 https://github.com/Rushikesh8983/MastersDataScience_Deep-learning-project/blob/master/RD_Language%20translate.ipynb
+
+```
+tensorflowjs_converter --help
+ 
+tensorflowjs_converter \
+--output_format=tfjs_graph_model \
+ /Users/a01082705520/Documents/2018_Capstone/code/LOVA_logical/src/ \
+ /Users/a01082705520/Documents/2018_Capstone/code/LOVA_logical/
+
+tensorflowjs_converter \
+--input_format=tf_saved_model \
+--output_format=tfjs_graph_model \
+/Users/a01082705520/Documents/2018_Capstone/code/LOVA_logical/src/convertModels \
+/Users/a01082705520/Documents/2018_Capstone/code/LOVA_logical/src/
+
+tensorflowjs_converter \
+--input_format=tf_saved_model \
+--output_format=tfjs_graph_model \
+--saved_model_tags=serve \
+builder_save .
+```
