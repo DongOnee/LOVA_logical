@@ -1,5 +1,8 @@
 import tensorflow as tf
 
+
+
+
 ########################
 # Model 1
 #
@@ -9,10 +12,10 @@ def model_inputs():
     """
     Create the model inputs
     """
-    inputs_ = tf.placeholder(tf.float32, [None, None, None], name='inputs')  # vectors
-    lens_ = tf.placeholder(tf.int32, [None], name='lengths')
-    lens_opad = tf.placeholder(tf.int32, [None, 2], name='lengths_pad')
+    inputs_ = tf.placeholder(tf.float32, [None, None, None], name='essays')  # vectors
     scores_ = tf.placeholder(tf.float32, [None, 1], name='scores')
+    lens_ = tf.placeholder(tf.int32, [None], name='essay_lengths')
+    lens_opad = tf.placeholder(tf.int32, [None, 2], name='lengths_pad')
     batch_size_ = tf.placeholder(tf.int32, name='batch_size')
     keep_prob_ = tf.placeholder(tf.float32, name='keep_prob')
 

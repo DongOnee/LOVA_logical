@@ -14,9 +14,13 @@ asap_ranges = {
     8: (0, 60)
 }
 
-train_data_path = '../data/training_set_rel3.tsv'
-valid_data_path = '../data/valid_set.tsv'
-valid_predic_path = '../data/valid_sample_submission_2_column.csv'
+dataPath = ['../data/training_set_rel3.tsv',
+            '../data/valid_set.tsv',
+            '../data/valid_sample_submission_2_column.csv']
+
+# train_data_path = '../data/training_set_rel3.tsv'
+# valid_data_path = '../data/valid_set.tsv'
+# valid_predic_path = '../data/valid_sample_submission_2_column.csv'
 
 
 def get_nom_score(prompt_id, score):
@@ -25,17 +29,19 @@ def get_nom_score(prompt_id, score):
     return (score-min_) / (max_ - min_)
 
 
-def get_data(train_len=-1, valid_len=-1, paths=[train_data_path, valid_data_path, valid_predic_path]):
-    pd_train = pd.read_csv(paths[0], sep='\t') if train_len == -1 else pd.read_csv(paths[0], sep='\t', nrows=train_len)
-    pd_valid_data = pd.read_csv(paths[1], sep='\t') if valid_len == -1 else pd.read_csv(paths[1], sep='\t', nrows=valid_len)
-    pd_valid_y = pd.read_csv(paths[2]) if valid_len == -1 else pd.read_csv(paths[2], nrows=valid_len)
+def get_data(numberOfTrain=-1, numberOfValid=-1, paths=None):
+    if paths is None:
+        paths = dataPath
+    pdTrain = pd.read_csv(paths[0], sep='\t') if numberOfTrain == -1 else pd.read_csv(paths[0], sep='\t', nrows=numberOfTrain)
+    pd_valid_data = pd.read_csv(paths[1], sep='\t') if numberOfValid == -1 else pd.read_csv(paths[1], sep='\t', nrows=numberOfValid)
+    pd_valid_y = pd.read_csv(paths[2]) if numberOfValid == -1 else pd.read_csv(paths[2], nrows=numberOfValid)
     pd_valid = pd_valid_data.merge(pd_valid_y.rename(columns={'prediction_id': 'domain1_predictionid'}))
 
-    pd_train = pd_train[['essay_set', 'essay', 'domain1_score']].rename(columns={'domain1_score': 'score'}).sample(frac=1).reset_index(drop=True)
+    pdTrain = pdTrain[['essay_set', 'essay', 'domain1_score']].rename(columns={'domain1_score': 'score'}).sample(frac=1).reset_index(drop=True)
     pd_valid = pd_valid[['essay_set', 'essay', 'predicted_score']].rename(columns={'predicted_score': 'score'}).sample(frac=1).reset_index(drop=True)
 
-    train_x = np.array(pd_train['essay'])
-    train_y = [get_nom_score(p['essay_set'], p['score']) for _, p in pd_train.iterrows()]
+    train_x = np.array(pdTrain['essay'])
+    train_y = [get_nom_score(p['essay_set'], p['score']) for _, p in pdTrain.iterrows()]
     valid_x = np.array(pd_valid['essay'])
     valid_y = [get_nom_score(p['essay_set'], p['score']) for _, p in pd_valid.iterrows()]
 
