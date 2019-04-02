@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 from nltk.tokenize import sent_tokenize
+import tensorflow as tf
+from ast import literal_eval
 
 asap_ranges = {
     0: (0, 60),
@@ -53,16 +55,46 @@ def get_data(numberOfTrain=-1, numberOfValid=-1, paths=None):
     return train_x, train_y, valid_x, valid_y
 
 
-def get_batches(x, lengths, y, batch_size=100):
+def get_batches(x, y, embed, batch_size=100):
     """
     Batch Generator for Training
     :param x            : Input array of x data
-    :param lengths      : Input array of length of x data
     :param y            : Input array of y data
     :param batch_size   : Input int, size of batch
     :return             : generator that returns a tuple of our x batch and y batch
     """
+
     n_batches = len(x)//batch_size
-    x, lengths, y = x[:n_batches*batch_size], lengths[:n_batches*batch_size], y[:n_batches*batch_size]
+    x, y = x[:n_batches * batch_size], y[:n_batches * batch_size]
     for ii in range(0, len(x), batch_size):
-        yield x[ii:ii+batch_size], lengths[ii:ii+batch_size], y[ii:ii+batch_size]
+        batch_x, batch_y = x[ii:ii+batch_size], y[ii:ii+batch_size]
+        ret_x, ret_len = [], []
+        proc_x=[]
+        for paragraph in batch_x:
+            embeds = embed(paragraph, signature="default", as_dict=True)['elmo']
+            proc_x.append(embeds)
+
+        with tf.Session() as sess:
+            sess.run(tf.global_variables_initializer())
+
+            for i in range(batch_size):
+                sentence_rep = tf.reduce_mean(proc_x[i], 1)  # [??, ???, 1024] => [??, 1024]
+                length = len(batch_x[i])
+                paddings = tf.constant([[0, 100 - length], [0, 0]])  # to 100 sentence padding
+                sentence_rep = tf.pad(sentence_rep, paddings, "CONSTANT")  # [??, 1024] => [100, 1024]
+                ret_x.append(sess.run(sentence_rep))
+                ret_len.append(length)
+
+        yield ret_x, ret_len, batch_y
+
+
+def get_data_set(file_path):
+    outx = [[0] * 1024 for _ in range(100)]
+    x = pd.read_csv(file_path)[:]['essay'].values
+    outx[:len(x)] = x
+    x = [literal_eval(xx) for xx in x]
+    lx = [len(xx) for xx in x]
+    y = pd.read_csv(file_path)[:]['score'].values
+    y = [[yy] for yy in y]
+
+    return outx, lx, y

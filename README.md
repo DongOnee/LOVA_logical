@@ -1,6 +1,35 @@
 # LOVA_logical
 Hanyang Univ.
 
+2019.4.3. dong's ver3.0
+----
+> training 하는 과정에서 데이터를 전처리 하는데 오랜 시간이 걸리는걸 확인 하였다<br>
+> 이 부분을 해결 하기 위해 모든 데이터에 대해서 전처리를 해놓고 학습 시킬때 불러오는 식으로 하기로 하였다.
+
+- src/train.py
+    - 전처리 된 데이터를 불러들어와서 feed 시킨다.
+    
+- src/utils.py
+    - 전처리 하는 함수를 새로 만들었다.
+    
+- src/preprocess.py
+    - 기존의 코드에서 전처리 하는 코드.
+    
+- data/train_preproc_{}.csv
+    - 전처리된 데이터
+
+2019.3.29. dong's ver2.3
+----
+
+- src/embedding.py
+    - 필요가 없다. 삭제
+    
+- src/utils.py
+    - 기존에 embedding.py 에 쓰던것을 옮겨 놓았다. yield 를 이용한 방법이 메모리나 cpu 효율에 더 좋지 않을까 싶어서.
+
+- src/train.py
+    - 앞서 바꾼 내용에 맞게 수정하였다.
+
 2019.3.18. dong's ver2.2
 ----
 
@@ -71,12 +100,14 @@ install package list
 - nltk : `conda install -c conda-forge nltk`
 - numpy : `conda install -c conda-forge numpy`
 - pandas : `conda install -c conda-forge pandas`
+- pymongo : `conda install -c conda-forge pymongo`
+- mongodb : `conda install -c conda-forge mongodb`
 
 https://github.com/Rushikesh8983/MastersDataScience_Deep-learning-project/blob/master/RD_Language%20translate.ipynb
 
 ```
 tensorflowjs_converter --help
- 
+
 tensorflowjs_converter \
 --output_format=tfjs_graph_model \
  /Users/a01082705520/Documents/2018_Capstone/code/LOVA_logical/src/ \
