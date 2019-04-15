@@ -1,8 +1,9 @@
-import pandas as pd
 import numpy as np
 from nltk.tokenize import sent_tokenize
 import tensorflow as tf
+import pandas as pd
 from ast import literal_eval
+import glob
 
 asap_ranges = {
     0: (0, 60),
@@ -95,15 +96,18 @@ def get_data_set(file_path):
 
     return outx, lx, y
 
-import glob
-
 
 def get_batches2():
     filepaths = glob.glob("../data/train_preproc_*")
 
     for filepath in filepaths:
         tmp = pd.read_csv(filepath).values
-        x = [literal_eval(xx) for xx in tmp[:, 0]]
+        x = []
+        for xx in tmp[:, 0]:
+            pad = [[0] * 1024 for _ in range(100)]
+            xx = literal_eval(xx)
+            pad[:len(xx)] = xx
+            x.extend(pad)
         y = tmp[:, 1]
         yield x, y
 
