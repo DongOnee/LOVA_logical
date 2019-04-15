@@ -37,7 +37,7 @@ with tf.Graph().as_default():
     # modeling
     essaysTensor, essaysLength, essaysLength2, essaysScore, batchSizeTensor, keepProbTensor = model_inputs()
     lstmOutputs, lstmCell, lstmFinalState = build_lstm_layers(lstmSizes, essaysTensor, essaysLength, batchSizeTensor, keepProbTensor)
-    predictionTensor, lossTensor, optimzerTensor = build_cost_fn_and_opt(lstmOutputs, essaysLength2, essaysScore, lr, batchSizeTensor)
+    predictionTensor, lossTensor, optimzerTensor = build_cost_fn_and_opt(lstmOutputs, essaysLength2, essaysScore, lr)
 
     elmo_module_url = "https://tfhub.dev/google/elmo/2"
     embed = hub.Module(elmo_module_url)
@@ -62,7 +62,7 @@ with tf.Graph().as_default():
                 feed = {essaysTensor:       essays,
                         essaysLength:       lx,
                         essaysLength2:      llp,
-                        essaysScore:        scores,
+                        essaysScore:        [score for score in scores],
                         batchSizeTensor:    batchSize,
                         keepProbTensor:     0.5}
                 loss_, state, _ = sess.run([loss_hist, lstmFinalState, optimzerTensor], feed_dict=feed)
