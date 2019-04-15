@@ -3,7 +3,6 @@ from models import *
 from utils import *
 import tensorflow as tf
 import tensorflow_hub as hub
-from ast import literal_eval
 import time
 
 ###############
@@ -36,14 +35,14 @@ print('#' * 5, "cntDataset      :", cntDataset)
 print("graph on")
 with tf.Graph().as_default():
     # modeling
-    i, l, l_p, s, bs, kp = model_inputs()
-    lo, c, final = build_lstm_layers(lstmSizes, i, l, bs, kp)
-    pre, loss, opt = build_cost_fn_and_opt(lo, l_p, s, lr, bs)
+    essaysTensor, essaysLength, essaysLength2, essaysScore, batchSizeTensor, keepProbTensor = model_inputs()
+    lstmOutputs, lstmCell, lstmFinalState = build_lstm_layers(lstmSizes, essaysTensor, essaysLength, batchSizeTensor, keepProbTensor)
+    predictionTensor, lossTensor, optimzerTensor = build_cost_fn_and_opt(lstmOutputs, essaysLength2, essaysScore, lr, batchSizeTensor)
 
     elmo_module_url = "https://tfhub.dev/google/elmo/2"
     embed = hub.Module(elmo_module_url)
 
-    loss_hist = tf.summary.scalar('loss_hist', loss)
+    loss_hist = tf.summary.scalar('loss_hist', lossTensor)
     saver = tf.train.Saver()
 
     with tf.Session() as sess:
@@ -56,40 +55,32 @@ with tf.Graph().as_default():
 
         for e in range(epochs):
             now_time = -time.time()
-            state = sess.run(c.zero_state(batchSize, tf.float32))
-
-            for cntI in range(1, cntDataset+1):
-                pdDataPath = '../data/train_preproc_'+str(cntDataset*batchSize)+'.csv'
-                x, lx, y = get_data_set(pdDataPath)
+            state = sess.run(lstmCell.zero_state(batchSize, tf.float32))
+            for cntI, (essays, scores) in enumerate(get_batches2(), 1):
+                lx = [len(xx) for xx in essays]
                 llp = [[index, length - 1] for index, length in enumerate(lx)]
-                feed = {i: x,
-                        l: lx,
-                        l_p: llp,
-                        s: y,
-                        bs: batchSize,
-                        kp: 0.5}
-                loss_, state, _ = sess.run([loss_hist, final, opt], feed_dict=feed)
-                train_writer.add_summary(loss_, cntI*batchSize+ii)
+                feed = {essaysTensor:       essays,
+                        essaysLength:       lx,
+                        essaysLength2:      llp,
+                        essaysScore:        scores,
+                        batchSizeTensor:    batchSize,
+                        keepProbTensor:     0.5}
+                loss_, state, _ = sess.run([loss_hist, lstmFinalState, optimzerTensor], feed_dict=feed)
+                train_writer.add_summary(loss_, cntI*batchSize)
 
-                if cntI % 10 == 0:
-                    pdValidPath = '../data/valid_preproc_'+str(cntI//10)+'.csv'
-                    vx, vlx, vy = get_data_set(pdValidPath)
-                    val_state = sess.run(c.zero_state(batchSize, tf.float32))
-                    vllp = [[index, length - 1] for index, length in enumerate(vlx)]
-                    feed = {i: vx,
-                            l: vlx,
-                            l_p: vllp,
-                            s: vy,
-                            bs: batchSize,
-                            kp: 1}
-                    val_loss, val_state = sess.run([loss_hist, final], feed_dict=feed)
-                    valid_writer.add_summary(val_loss, cntI*batchSize, )
-
-                    del vx
-                    del vy
-
-                del x
-                del y
+                # if cntI % 10 == 0:
+                #     pdValidPath = '../data/valid_preproc_'+str(cntI//10)+'.csv'
+                #     vx, vlx, vy = get_data_set(pdValidPath)
+                #     val_state = sess.run(lstmCell.zero_state(batchSize, tf.float32))
+                #     vllp = [[index, length - 1] for index, length in enumerate(vlx)]
+                #     feed = {essaysTensor:       vx,
+                #             essaysLength:       vlx,
+                #             essaysLength2:      vllp,
+                #             essaysScore:        vy,
+                #             batchSizeTensor:    batchSize,
+                #             keepProbTensor:     1}
+                #     val_loss, val_state = sess.run([loss_hist, lstmFinalState], feed_dict=feed)
+                #     valid_writer.add_summary(val_loss, cntI*batchSize)
 
             now_time += time.time()
             now_time = time.gmtime(now_time)

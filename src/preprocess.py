@@ -30,25 +30,23 @@ def get_nom_score(prompt_id, score):
 batchSize = 100
 sliceCnt = int(sys.argv[1])
 
-
 paths = dataPath
+
 pdTrain = pd.read_csv(paths[0], sep='\t', nrows=sliceCnt*batchSize)[-batchSize:]
-pd_valid_data = pd.read_csv(paths[1], sep='\t', nrows=sliceCnt*batchSize)[-batchSize:]
-pd_valid_y = pd.read_csv(paths[2], nrows=sliceCnt*batchSize)[-batchSize:]
-pdValid = pd_valid_data.merge(pd_valid_y.rename(columns={'prediction_id': 'domain1_predictionid'}))
-
 pdTrain = pdTrain[['essay_set', 'essay', 'domain1_score']].rename(columns={'domain1_score': 'score'}).sample(frac=1).reset_index(drop=True)
-pdValid = pdValid[['essay_set', 'essay', 'predicted_score']].rename(columns={'predicted_score': 'score'}).sample(frac=1).reset_index(drop=True)
-
 trainX = np.array(pdTrain['essay'])
-trainY = [get_nom_score(p['essay_set'], p['score']) for _, p in pdTrain.iterrows()]
-validX = np.array(pdValid['essay'])
-validY = [get_nom_score(p['essay_set'], p['score']) for _, p in pdValid.iterrows()]
-
 trainX = [sent_tokenize(pa) for pa in trainX]
+trainY = [get_nom_score(p['essay_set'], p['score']) for _, p in pdTrain.iterrows()]
 trainY = [[pa] for pa in trainY]
-validX = [sent_tokenize(pa) for pa in validX]
-validY = [[pa] for pa in validY]
+
+# pd_valid_data = pd.read_csv(paths[1], sep='\t', nrows=sliceCnt*batchSize)[-batchSize:]
+# pd_valid_y = pd.read_csv(paths[2], nrows=sliceCnt*batchSize)[-batchSize:]
+# pdValid = pd_valid_data.merge(pd_valid_y.rename(columns={'prediction_id': 'domain1_predictionid'}))
+# pdValid = pdValid[['essay_set', 'essay', 'predicted_score']].rename(columns={'predicted_score': 'score'}).sample(frac=1).reset_index(drop=True)
+# validX = np.array(pdValid['essay'])
+# validX = [sent_tokenize(pa) for pa in validX]
+# validY = [get_nom_score(p['essay_set'], p['score']) for _, p in pdValid.iterrows()]
+# validY = [[pa] for pa in validY]
 
 with tf.device("/gpu:0"):
     with tf.Graph().as_default():

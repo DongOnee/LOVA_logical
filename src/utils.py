@@ -20,10 +20,6 @@ dataPath = ['../data/training_set_rel3.tsv',
             '../data/valid_set.tsv',
             '../data/valid_sample_submission_2_column.csv']
 
-# train_data_path = '../data/training_set_rel3.tsv'
-# valid_data_path = '../data/valid_set.tsv'
-# valid_predic_path = '../data/valid_sample_submission_2_column.csv'
-
 
 def get_nom_score(prompt_id, score):
     min_, max_ = asap_ranges[prompt_id]
@@ -98,3 +94,16 @@ def get_data_set(file_path):
     y = [[yy] for yy in y]
 
     return outx, lx, y
+
+import glob
+
+
+def get_batches2():
+    filepaths = glob.glob("../data/train_preproc_*")
+
+    for filepath in filepaths:
+        tmp = pd.read_csv(filepath).values
+        x = [literal_eval(xx) for xx in tmp[:, 0]]
+        y = tmp[:, 1]
+        yield x, y
+

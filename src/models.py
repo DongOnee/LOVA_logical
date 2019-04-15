@@ -15,11 +15,11 @@ def model_inputs():
     inputs_ = tf.placeholder(tf.float32, [None, None, None], name='essays')  # vectors
     scores_ = tf.placeholder(tf.float32, [None, 1], name='scores')
     lens_ = tf.placeholder(tf.int32, [None], name='essay_lengths')
-    lens_opad = tf.placeholder(tf.int32, [None, 2], name='lengths_pad')
+    lens_pad_ = tf.placeholder(tf.int32, [None, 2], name='lengths_pad')
     batch_size_ = tf.placeholder(tf.int32, name='batch_size')
     keep_prob_ = tf.placeholder(tf.float32, name='keep_prob')
 
-    return inputs_, lens_, lens_opad, scores_, batch_size_, keep_prob_
+    return inputs_, lens_, lens_pad_, scores_, batch_size_, keep_prob_
 
 
 def build_lstm_layers(lstm_sizes, embed, embed_len, batch_size, keep_prob_):
