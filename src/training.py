@@ -62,7 +62,7 @@ with tf.Graph().as_default():
                 feed = {essaysTensor:       essays,
                         essaysLength:       lx,
                         essaysLength2:      llp,
-                        essaysScore:        [score for score in scores],
+                        essaysScore:        [[score] for score in scores],
                         batchSizeTensor:    batchSize,
                         keepProbTensor:     0.5}
                 loss_, state, _ = sess.run([loss_hist, lstmFinalState, optimzerTensor], feed_dict=feed)
