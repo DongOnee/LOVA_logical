@@ -107,7 +107,7 @@ def get_batches2():
             pad = [[0] * 1024 for _ in range(100)]
             xx = literal_eval(xx)
             pad[:len(xx)] = xx
-            x.extend(pad)
+            x.append(pad)
         y = tmp[:, 1]
         yield x, y
 
