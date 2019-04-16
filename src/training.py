@@ -57,7 +57,7 @@ with tf.Graph().as_default():
             now_time = -time.time()
             state = sess.run(lstm_cell.zero_state(batch_size_, tf.float32))
             for cntI, (essays_, scores_) in enumerate(get_batches2(), 1):
-                lx = [len(xx) for xx in essays]
+                lx = [len(xx) for xx in essays_]
                 llp = [[index, length - 1] for index, length in enumerate(lx)]
                 feed = {
                     essays:        essays_,
