@@ -39,7 +39,7 @@ def get_train_data(path, batch_size):
     essays = [sent_tokenize(_essay) for _essay in essays]
     scores = [get_nom_score(_row['essay_set'], _row['score']) for _, _row in df.iterrows()]
     for cnt in range(batch_cnt):
-        yield essays[cnt*batch_size:(cnt+1)*batch_size], scores[cnt*batch_size:(cnt+1)*batch_size]
+        yield essays[cnt * batch_size:(cnt+1) * batch_size], scores[cnt * batch_size:(cnt+1) * batch_size]
 
 
 def get_valid_data(path_essay, path_score, batch_size):
@@ -56,7 +56,7 @@ def get_valid_data(path_essay, path_score, batch_size):
     essays = [sent_tokenize(_essay) for _essay in essays]
     scores = [get_nom_score(_row['essay_set'], _row['score']) for _, _row in df.iterrows()]
     for cnt in range(batch_cnt):
-        yield essays[cnt*batch_size:(cnt+1)*batch_size], scores[cnt*batch_size:(cnt+1)*batch_size]
+        yield essays[cnt * batch_size:(cnt+1) * batch_size], scores[cnt * batch_size:(cnt+1) * batch_size]
 
 
 if __name__ == '__main__':
@@ -94,10 +94,9 @@ if __name__ == '__main__':
                         embedding = embed(essay_, signature="default", as_dict=True)['elmo']
                         sentence_rep = tf.reduce_mean(embedding, 1)  # [??, ???, 1024] => [??, 1024]
                         df_.loc[index] = [sess.run(sentence_rep).tolist(), len(essay_), score_]
-                    df_.to_csv('../preproc/train_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
+                    df_.to_csv('../preproc/valid_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
                     del [[df_]]
                     now_time += time.time()
                     now_time = time.gmtime(now_time)
                     print("Count: {}...\n".format(batch_count),
                           "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
-
