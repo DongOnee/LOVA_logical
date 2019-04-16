@@ -45,7 +45,7 @@ def build_cost_fn_and_opt(lstm_outputs, indice,  scores_, learning_rate):
     :parm "learning_rate"   : learning rate
     """
     predictions = tf.gather_nd(lstm_outputs, indice)
-    predictions = tf.contrib.layers.fully_connected(predictions, 1, activation_fn=tf.sigmoid, name="result")
+    predictions = tf.contrib.layers.fully_connected(predictions, 1, activation_fn=tf.sigmoid)
     # predictions = tf.reshape(predictions, [-1, 1], name="result")
 
     loss = tf.losses.mean_squared_error(scores_, predictions, weights=0)
