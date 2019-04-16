@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import time
+import gc
 import tensorflow as tf
 import tensorflow_hub as hub
 from nltk.tokenize import sent_tokenize
@@ -80,6 +81,7 @@ if __name__ == '__main__':
                         df_.loc[index] = [sess.run(sentence_rep).tolist(), len(essay_), score_]
                     df_.to_csv('../preproc/train_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
                     del [[df_]]
+                    gc.collect()
                     now_time += time.time()
                     now_time = time.gmtime(now_time)
                     print("Count: {}...\n".format(batch_count),
@@ -96,6 +98,7 @@ if __name__ == '__main__':
                         df_.loc[index] = [sess.run(sentence_rep).tolist(), len(essay_), score_]
                     df_.to_csv('../preproc/valid_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
                     del [[df_]]
+                    gc.collect()
                     now_time += time.time()
                     now_time = time.gmtime(now_time)
                     print("Count: {}...\n".format(batch_count),
