@@ -55,7 +55,7 @@ with tf.Graph().as_default():
 
         for e in range(epochs):
             now_time = -time.time()
-            state = sess.run(lstm_cell.zero_state(batch_size, tf.float32))
+            state = sess.run(lstm_cell.zero_state(batch_size_, tf.float32))
             for cntI, (essays_, scores_) in enumerate(get_batches2(), 1):
                 lx = [len(xx) for xx in essays]
                 llp = [[index, length - 1] for index, length in enumerate(lx)]
@@ -64,7 +64,7 @@ with tf.Graph().as_default():
                     lengths:       lx,
                     indice:        llp,
                     scores:        scores_,
-                    batch_size:    batch_size,
+                    batch_size:    batch_size_,
                     keep_prob:     0.5
                 }
                 loss_, state, _ = sess.run([loss_hist, lstm_final_state, optimizer], feed_dict=feed)
