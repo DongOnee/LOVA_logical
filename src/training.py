@@ -2,7 +2,6 @@ import argparse
 from models import *
 from utils import *
 import tensorflow as tf
-import tensorflow_hub as hub
 import time
 
 ###############
@@ -38,9 +37,6 @@ with tf.Graph().as_default():
     essays, lengths, indice, scores, batch_size, keep_prob = model_inputs()
     lstm_outputs, lstm_cell, lstm_final_state = build_lstm_layers(lstm_size, essays, lengths, batch_size, keep_prob)
     predictions, losses, optimizer = build_cost_fn_and_opt(lstm_outputs, indice, scores, lr)
-
-    elmo_module_url = "https://tfhub.dev/google/elmo/2"
-    embed = hub.Module(elmo_module_url)
 
     loss_hist = tf.summary.scalar('loss_hist', losses)
     saver = tf.train.Saver()

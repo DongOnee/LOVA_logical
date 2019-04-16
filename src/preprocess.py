@@ -54,15 +54,13 @@ def get_valid_data(path_essay, path_score, batch_size):
         .reset_index(drop=True)
     essays = np.array(df['essay'])
     essays = [sent_tokenize(_essay) for _essay in essays]
-    scores = [get_nom_score(_row['essay_set'], _row['score']) for _, _row in _df.iterrows()]
+    scores = [get_nom_score(_row['essay_set'], _row['score']) for _, _row in df.iterrows()]
     for cnt in range(batch_cnt):
         yield essays[cnt*batch_size:(cnt+1)*batch_size], scores[cnt*batch_size:(cnt+1)*batch_size]
 
 
 if __name__ == '__main__':
     batch_size_ = 100
-    train_essays, train_scores = get_train_data(paths[0], batch_size_)
-    valid_essays, valid_scores = get_valid_data(paths[1], paths[2], batch_size_)
 
     with tf.device("/gpu:0"):
         with tf.Graph().as_default():

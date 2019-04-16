@@ -111,3 +111,19 @@ def get_batches2():
         y = tmp[:, 1]
         yield x, y
 
+
+def get_batches3():
+    filepaths = glob.glob("../preproc/train_preproc_*")
+
+    for filepath in filepaths:
+        tmp = pd.read_csv(filepath).values
+        x = []
+        for xx in tmp[:, 0]:
+            pad = [[0] * 1024 for _ in range(100)]
+            xx = literal_eval(xx)
+            pad[:len(xx)] = xx
+            x.append(pad)
+        lens = tmp[:, 1]
+        y = tmp[:, 2]
+        yield x, lens, y
+
