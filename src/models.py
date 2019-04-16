@@ -1,8 +1,5 @@
 import tensorflow as tf
 
-
-
-
 ########################
 # Model 1
 #
@@ -12,14 +9,13 @@ def model_inputs():
     """
     Create the model inputs
     """
-    inputs_ = tf.placeholder(tf.float32, [None, None, None], name='essays')  # vectors
-    scores_ = tf.placeholder(tf.float32, [None, 1], name='scores')
+    inputs_ = tf.placeholder(tf.float32, [None, None, None], name='essays')
+    scores_ = tf.placeholder(tf.float32, [None], name='scores')
     lens_ = tf.placeholder(tf.int32, [None], name='essay_lengths')
-    lens_pad_ = tf.placeholder(tf.int32, [None, 2], name='lengths_pad')
     batch_size_ = tf.placeholder(tf.int32, name='batch_size')
     keep_prob_ = tf.placeholder(tf.float32, name='keep_prob')
 
-    return inputs_, lens_, lens_pad_, scores_, batch_size_, keep_prob_
+    return inputs_, lens_, scores_, batch_size_, keep_prob_
 
 
 def build_lstm_layers(lstm_sizes, embed, embed_len, batch_size, keep_prob_):
@@ -47,12 +43,12 @@ def build_cost_fn_and_opt(lstm_outputs, lengths,  scores_, learning_rate):
     :parm "scores_"         : true score value
     :parm "learning_rate"   : learning rate
     """
-    predictions = tf.gather_nd(lstm_outputs, lengths)
-    # lstm_outputs = tf.reduce_mean(lstm_outputs, 1)
-    predictions = tf.contrib.layers.fully_connected(predictions, 1, activation_fn=tf.sigmoid)
-    predictions = tf.reshape(predictions, [-1, 1], name="result")
+    predictions = tf.gather_nd(lstm_outputs, [[index, length - 1] for index, length in enumerate(lengths)])
+    predictions = tf.contrib.layers.fully_connected(predictions, 1, activation_fn=tf.sigmoid, name="result")
+    # predictions = tf.reshape(predictions, [-1, 1], name="result")
 
-    loss = tf.losses.mean_squared_error(scores_, predictions)
+    loss = tf.losses.mean_squared_error(scores_, predictions, weights=0)
     optimzer = tf.train.AdadeltaOptimizer(learning_rate).minimize(loss)
 
     return predictions, loss, optimzer
+

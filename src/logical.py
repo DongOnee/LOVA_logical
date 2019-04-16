@@ -8,8 +8,8 @@ from nltk.tokenize import sent_tokenize
 parser = argparse.ArgumentParser()
 parser.add_argument("-e", "--essay-path", dest="essay", type=str, metavar='<str>', required=True,
                     help="The path to the essay")
-parser.add_argument("-s", "--step", dest="step", type=str, metavar='<str>', default="3",
-                    help="saver global step number (default=3)")
+parser.add_argument("-s", "--step", dest="step", type=str, metavar='<str>', default="5",
+                    help="saver global step number (default=5)")
 args = parser.parse_args()
 
 start_time = time.time()
@@ -36,11 +36,13 @@ with tf.Graph().as_default():
         lp = graph_.get_tensor_by_name('lengths_pad:0')
         kp = graph_.get_tensor_by_name('keep_prob:0')
         bs = graph_.get_tensor_by_name('batch_size:0')
-        siba = sess.run(res, feed_dict={i: vector_essay,
-                                 l: length_essay,
-                                 lp: [[0, length_essay[0]]],
-                                 kp: 1,
-                                 bs: 1})
+        siba = sess.run(res, feed_dict={
+            i: vector_essay,
+            l: length_essay,
+            lp: [[0, length_essay[0]]],
+            kp: 1,
+            bs: 1
+        })
 
 print(siba[0][0])
 run_time = time.gmtime(time.time()-start_time)

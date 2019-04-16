@@ -18,31 +18,31 @@ args = parser.parse_args()
 
 ###############
 # Hyper params
-globalStep = args.step
+global_step = args.step
+lstm_size = [1024, 256]
 epochs = args.epochs
-cntDataset = args.cntDataset
-lstmSizes = [1024, 256]
-batchSize = 100
 lr = 0.001
+batch_size_ = 100
+dataset_cnt = args.cntDataset
 
-print('#' * 5, "global_step     :", globalStep)
-print('#' * 5, "lstm_sizes      :", lstmSizes)
-print('#' * 5, "epochs          :", epochs)
-print('#' * 5, "learning_rate   :", lr)
-print('#' * 5, "batchSize       :", batchSize)
-print('#' * 5, "cntDataset      :", cntDataset)
+print('#' * 5, "Global Step     :", global_step)
+print('#' * 5, "LSTM Cell Size  :", lstm_size)
+print('#' * 5, "Epochs          :", epochs)
+print('#' * 5, "Learning Rate   :", lr)
+print('#' * 5, "Batch Size      :", batch_size_)
+print('#' * 5, "Data Set Count  :", dataset_cnt)
 
 print("graph on")
 with tf.Graph().as_default():
     # modeling
-    essaysTensor, essaysLength, essaysLength2, essaysScore, batchSizeTensor, keepProbTensor = model_inputs()
-    lstmOutputs, lstmCell, lstmFinalState = build_lstm_layers(lstmSizes, essaysTensor, essaysLength, batchSizeTensor, keepProbTensor)
-    predictionTensor, lossTensor, optimzerTensor = build_cost_fn_and_opt(lstmOutputs, essaysLength2, essaysScore, lr)
+    essays, lengths, scores, batch_size, keep_prob = model_inputs()
+    lstm_outputs, lstm_cell, lstm_final_state = build_lstm_layers(lstm_size, essays, lengths, batch_size, keep_prob)
+    predictions, losses, optimizer = build_cost_fn_and_opt(lstm_outputs, lengths, scores, lr)
 
     elmo_module_url = "https://tfhub.dev/google/elmo/2"
     embed = hub.Module(elmo_module_url)
 
-    loss_hist = tf.summary.scalar('loss_hist', lossTensor)
+    loss_hist = tf.summary.scalar('loss_hist', losses)
     saver = tf.train.Saver()
 
     with tf.Session() as sess:
@@ -55,18 +55,19 @@ with tf.Graph().as_default():
 
         for e in range(epochs):
             now_time = -time.time()
-            state = sess.run(lstmCell.zero_state(batchSize, tf.float32))
-            for cntI, (essays, scores) in enumerate(get_batches2(), 1):
+            state = sess.run(lstm_cell.zero_state(batch_size, tf.float32))
+            for cntI, (essays_, scores_) in enumerate(get_batches2(), 1):
                 lx = [len(xx) for xx in essays]
                 llp = [[index, length - 1] for index, length in enumerate(lx)]
-                feed = {essaysTensor:       essays,
-                        essaysLength:       lx,
-                        essaysLength2:      llp,
-                        essaysScore:        [[score] for score in scores],
-                        batchSizeTensor:    batchSize,
-                        keepProbTensor:     0.5}
-                loss_, state, _ = sess.run([loss_hist, lstmFinalState, optimzerTensor], feed_dict=feed)
-                train_writer.add_summary(loss_, cntI*batchSize)
+                feed = {
+                    essays:        essays_,
+                    lengths:       lx,
+                    scores:        scores_,
+                    batch_size:    batch_size,
+                    keep_prob:     0.5
+                }
+                loss_, state, _ = sess.run([loss_hist, lstm_final_state, optimizer], feed_dict=feed)
+                train_writer.add_summary(loss_, cntI * batch_size_)
 
                 # if cntI % 10 == 0:
                 #     pdValidPath = '../data/valid_preproc_'+str(cntI//10)+'.csv'
@@ -84,9 +85,9 @@ with tf.Graph().as_default():
 
             now_time += time.time()
             now_time = time.gmtime(now_time)
-            print("Epoch: {}/{}...".format(e + 1, epochs),
+            print("Epoch: {}/{}...\n".format(e + 1, epochs),
                   "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
-            saver.save(sess, "logic_models/dongs", global_step=globalStep)
+            saver.save(sess, "logic_models/dongs", global_step=global_step)
 
-            train_writer.close()
-            valid_writer.close()
+        train_writer.close()
+        valid_writer.close()
