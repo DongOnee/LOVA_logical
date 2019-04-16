@@ -42,7 +42,6 @@ with tf.Graph().as_default():
     saver = tf.train.Saver()
 
     with tf.Session() as sess:
-
         # merged = tf.summary.merge_all()
         train_writer = tf.summary.FileWriter('board/train', sess.graph)
         valid_writer = tf.summary.FileWriter('board/valid')
@@ -52,7 +51,7 @@ with tf.Graph().as_default():
         for e in range(epochs):
             now_time = -time.time()
             state = sess.run(lstm_cell.zero_state(batch_size_, tf.float32))
-            for cntI, (essays_, scores_) in enumerate(get_batches2(), 1):
+            for _index, (essays_, scores_) in enumerate(get_batches2(), 1):
                 lx = [len(xx) for xx in essays_]
                 llp = [[index, length - 1] for index, length in enumerate(lx)]
                 feed = {
@@ -64,10 +63,10 @@ with tf.Graph().as_default():
                     keep_prob:     0.5
                 }
                 loss_, state, _ = sess.run([loss_hist, lstm_final_state, optimizer], feed_dict=feed)
-                train_writer.add_summary(loss_, cntI * batch_size_)
+                train_writer.add_summary(loss_, _index * batch_size_)
 
-                # if cntI % 10 == 0:
-                #     pdValidPath = '../data/valid_preproc_'+str(cntI//10)+'.csv'
+                # if _index % 10 == 0:
+                #     pdValidPath = '../data/valid_preproc_'+str(_index//10)+'.csv'
                 #     vx, vlx, vy = get_data_set(pdValidPath)
                 #     val_state = sess.run(lstmCell.zero_state(batchSize, tf.float32))
                 #     vllp = [[index, length - 1] for index, length in enumerate(vlx)]
@@ -78,7 +77,7 @@ with tf.Graph().as_default():
                 #             batchSizeTensor:    batchSize,
                 #             keepProbTensor:     1}
                 #     val_loss, val_state = sess.run([loss_hist, lstmFinalState], feed_dict=feed)
-                #     valid_writer.add_summary(val_loss, cntI*batchSize)
+                #     valid_writer.add_summary(val_loss, _index*batchSize)
 
             now_time += time.time()
             now_time = time.gmtime(now_time)

@@ -77,7 +77,7 @@ if __name__ == '__main__':
                         embedding = embed(essay_, signature="default", as_dict=True)['elmo']
                         sentence_rep = tf.reduce_mean(embedding, 1)  # [??, ???, 1024] => [??, 1024]
                         df_.loc[index] = [sess.run(sentence_rep).tolist(), len(essay_), score_]
-                    df_.to_csv('../preproc/train_preproc_' + str(index).zfill(4) + '.csv', index=False)
+                    df_.to_csv('../preproc/train_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
                     now_time += time.time()
                     now_time = time.gmtime(now_time)
                     print("Count: {}...\n".format(batch_count),
@@ -92,7 +92,7 @@ if __name__ == '__main__':
                         embedding = embed(essay_, signature="default", as_dict=True)['elmo']
                         sentence_rep = tf.reduce_mean(embedding, 1)  # [??, ???, 1024] => [??, 1024]
                         df_.loc[index] = [sess.run(sentence_rep).tolist(), len(essay_), score_]
-                    df_.to_csv('../preproc/train_preproc_' + str(index).zfill(4) + '.csv', index=False)
+                    df_.to_csv('../preproc/train_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
                     now_time += time.time()
                     now_time = time.gmtime(now_time)
                     print("Count: {}...\n".format(batch_count),
