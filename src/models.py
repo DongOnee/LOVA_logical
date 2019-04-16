@@ -12,10 +12,11 @@ def model_inputs():
     inputs_ = tf.placeholder(tf.float32, [None, None, None], name='essays')
     scores_ = tf.placeholder(tf.float32, [None], name='scores')
     lens_ = tf.placeholder(tf.int32, [None], name='essay_lengths')
+    indice_ = tf.placeholder(tf.int32, [None, 2], name='indice')
     batch_size_ = tf.placeholder(tf.int32, name='batch_size')
     keep_prob_ = tf.placeholder(tf.float32, name='keep_prob')
 
-    return inputs_, lens_, scores_, batch_size_, keep_prob_
+    return inputs_, lens_, indice_, scores_, batch_size_, keep_prob_
 
 
 def build_lstm_layers(lstm_sizes, embed, embed_len, batch_size, keep_prob_):
@@ -35,7 +36,7 @@ def build_lstm_layers(lstm_sizes, embed, embed_len, batch_size, keep_prob_):
     return lstm_outputs, cell, final_state
 
 
-def build_cost_fn_and_opt(lstm_outputs, lengths,  scores_, learning_rate):
+def build_cost_fn_and_opt(lstm_outputs, indice,  scores_, learning_rate):
     """
     Create the Loss function and Optimizer
     :parm "lstm_outputs"    : output of lstm layers
@@ -43,7 +44,7 @@ def build_cost_fn_and_opt(lstm_outputs, lengths,  scores_, learning_rate):
     :parm "scores_"         : true score value
     :parm "learning_rate"   : learning rate
     """
-    predictions = tf.gather_nd(lstm_outputs, [[index, length - 1] for index, length in enumerate(lengths)])
+    predictions = tf.gather_nd(lstm_outputs, indice)
     predictions = tf.contrib.layers.fully_connected(predictions, 1, activation_fn=tf.sigmoid, name="result")
     # predictions = tf.reshape(predictions, [-1, 1], name="result")
 

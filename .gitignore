@@ -2,3 +2,5 @@
 *.pckl
 data/*
 src/.ipynb_checkpoints
+src/board/*
+src/logic_models/*

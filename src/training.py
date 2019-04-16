@@ -35,9 +35,9 @@ print('#' * 5, "Data Set Count  :", dataset_cnt)
 print("graph on")
 with tf.Graph().as_default():
     # modeling
-    essays, lengths, scores, batch_size, keep_prob = model_inputs()
+    essays, lengths, indice, scores, batch_size, keep_prob = model_inputs()
     lstm_outputs, lstm_cell, lstm_final_state = build_lstm_layers(lstm_size, essays, lengths, batch_size, keep_prob)
-    predictions, losses, optimizer = build_cost_fn_and_opt(lstm_outputs, lengths, scores, lr)
+    predictions, losses, optimizer = build_cost_fn_and_opt(lstm_outputs, indice, scores, lr)
 
     elmo_module_url = "https://tfhub.dev/google/elmo/2"
     embed = hub.Module(elmo_module_url)
@@ -62,6 +62,7 @@ with tf.Graph().as_default():
                 feed = {
                     essays:        essays_,
                     lengths:       lx,
+                    indice:        llp,
                     scores:        scores_,
                     batch_size:    batch_size,
                     keep_prob:     0.5
