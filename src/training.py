@@ -64,7 +64,8 @@ with tf.device("/gpu:0"):
                         keep_prob:     0.5
                     }
                     loss_, state, _ = sess.run([loss_hist, lstm_final_state, optimizer], feed_dict=feed)
-                    train_writer.add_summary(loss_, _index * batch_size_)
+                    if _index % 20:
+                        train_writer.add_summary(loss_, _index)
 
                     # if _index % 10 == 0:
                     #     pdValidPath = '../data/valid_preproc_'+str(_index//10)+'.csv'
