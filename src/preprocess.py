@@ -58,7 +58,7 @@ def get_valid_data(path_essay, path_score, batch_size):
     essays = np.array(df['essay'])
     essays = [sent_tokenize(_essay) for _essay in essays]
     scores = [get_nom_score(_row['essay_set'], _row['score']) for _, _row in df.iterrows()]
-    del [[df]]
+    del [[df_essays, df_scores, df]]
     gc.collect()
     for cnt in range(batch_cnt):
         yield essays[cnt * batch_size:(cnt+1) * batch_size], scores[cnt * batch_size:(cnt+1) * batch_size]
@@ -83,7 +83,7 @@ def make_csv(index, essays, scores, train_or_valid):
 if __name__ == '__main__':
     batch_size_ = 100
 
-    with tf.device("/gpu:0"):
+    with tf.device("/cpu:0"):
         with tf.Graph().as_default():
             elmo_module_url = "https://tfhub.dev/google/elmo/2"
             embed = hub.Module(elmo_module_url)
