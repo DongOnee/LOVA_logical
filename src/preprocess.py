@@ -63,43 +63,43 @@ def get_valid_data(path_essay, path_score, batch_size):
 if __name__ == '__main__':
     batch_size_ = 100
 
-    with tf.device("/gpu:0"):
-        with tf.Graph().as_default():
-            elmo_module_url = "https://tfhub.dev/google/elmo/2"
-            embed = hub.Module(elmo_module_url)
-            with tf.Session() as sess:
-                sess.run(tf.global_variables_initializer())
+    # with tf.device("/gpu:0"):
+    with tf.Graph().as_default():
+        elmo_module_url = "https://tfhub.dev/google/elmo/2"
+        embed = hub.Module(elmo_module_url)
+        with tf.Session() as sess:
+            sess.run(tf.global_variables_initializer())
 
-                print("Train Data Preprocessing")
-                for batch_count, (essays_, scores_) in enumerate(get_train_data(paths[0], batch_size_), 1):
-                    print("{}'th batch".format(batch_count))
-                    now_time = -time.time()
-                    df_ = pd.DataFrame(columns=['essay', 'lengths', 'score'])
-                    for index, (essay_, score_) in enumerate(zip(essays_, scores_), 1):
-                        embedding = embed(essay_, signature="default", as_dict=True)['elmo']
-                        sentence_rep = tf.reduce_mean(embedding, 1)  # [??, ???, 1024] => [??, 1024]
-                        df_.loc[index] = [sess.run(sentence_rep).tolist(), len(essay_), score_]
-                    df_.to_csv('../preproc/train_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
-                    del [[df_]]
-                    gc.collect()
-                    now_time += time.time()
-                    now_time = time.gmtime(now_time)
-                    print("Count: {}...\n".format(batch_count),
-                          "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
+            print("Train Data Preprocessing")
+            for batch_count, (essays_, scores_) in enumerate(get_train_data(paths[0], batch_size_), 1):
+                print("{}'th batch".format(batch_count))
+                now_time = -time.time()
+                df_ = pd.DataFrame(columns=['essay', 'lengths', 'score'])
+                for index, (essay_, score_) in enumerate(zip(essays_, scores_), 1):
+                    embedding = embed(essay_, signature="default", as_dict=True)['elmo']
+                    sentence_rep = tf.reduce_mean(embedding, 1)  # [??, ???, 1024] => [??, 1024]
+                    df_.loc[index] = [sess.run(sentence_rep).tolist(), len(essay_), score_]
+                df_.to_csv('../preproc/train_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
+                del [[df_]]
+                gc.collect()
+                now_time += time.time()
+                now_time = time.gmtime(now_time)
+                print("Count: {}...\n".format(batch_count),
+                      "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
 
-                print("Valid Data Preprocessing")
-                for batch_count, (essays_, scores_) in enumerate(get_valid_data(paths[1], paths[2], batch_size_), 1):
-                    print("{}'th batch".format(batch_count))
-                    now_time = -time.time()
-                    df_ = pd.DataFrame(columns=['essay', 'lengths', 'score'])
-                    for index, (essay_, score_) in enumerate(zip(essays_, scores_), 1):
-                        embedding = embed(essay_, signature="default", as_dict=True)['elmo']
-                        sentence_rep = tf.reduce_mean(embedding, 1)  # [??, ???, 1024] => [??, 1024]
-                        df_.loc[index] = [sess.run(sentence_rep).tolist(), len(essay_), score_]
-                    df_.to_csv('../preproc/valid_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
-                    del [[df_]]
-                    gc.collect()
-                    now_time += time.time()
-                    now_time = time.gmtime(now_time)
-                    print("Count: {}...\n".format(batch_count),
-                          "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
+            print("Valid Data Preprocessing")
+            for batch_count, (essays_, scores_) in enumerate(get_valid_data(paths[1], paths[2], batch_size_), 1):
+                print("{}'th batch".format(batch_count))
+                now_time = -time.time()
+                df_ = pd.DataFrame(columns=['essay', 'lengths', 'score'])
+                for index, (essay_, score_) in enumerate(zip(essays_, scores_), 1):
+                    embedding = embed(essay_, signature="default", as_dict=True)['elmo']
+                    sentence_rep = tf.reduce_mean(embedding, 1)  # [??, ???, 1024] => [??, 1024]
+                    df_.loc[index] = [sess.run(sentence_rep).tolist(), len(essay_), score_]
+                df_.to_csv('../preproc/valid_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
+                del [[df_]]
+                gc.collect()
+                now_time += time.time()
+                now_time = time.gmtime(now_time)
+                print("Count: {}...\n".format(batch_count),
+                      "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
