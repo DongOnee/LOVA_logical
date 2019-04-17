@@ -59,7 +59,7 @@ with tf.device("/gpu:0"):
                         essays:        essays_,
                         lengths:       lx,
                         indice:        llp,
-                        scores:        scores_,
+                        scores:        [[score] for score in scores_],
                         batch_size:    batch_size_,
                         keep_prob:     0.5
                     }
