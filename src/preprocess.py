@@ -68,8 +68,6 @@ def make_csv(index, essays, scores, train_or_valid):
     now_time = -time.time()
     df = pd.DataFrame(columns=['essay', 'lengths', 'score'])
     for i, (essay, score) in enumerate(zip(essays, scores), 1):
-        debug_time = time.gmtime(time.time() + now_time)
-        # print("debug {}min {}sec".format(debug_time.tm_min, debug_time.tm_sec), end='\t')
         embedding = embed(essay, signature="default", as_dict=True)['elmo']
         sentence_rep = tf.reduce_mean(embedding, 1)  # [??, ???, 1024] => [??, 1024]
         df.loc[i] = [sess.run(sentence_rep).tolist(), len(essay), score]
