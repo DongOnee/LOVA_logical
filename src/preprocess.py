@@ -69,7 +69,7 @@ def make_csv(index, essays, scores, train_or_valid):
     df = pd.DataFrame(columns=['essay', 'lengths', 'score'])
     for i, (essay, score) in enumerate(zip(essays, scores), 1):
         debug_time = time.gmtime(time.time() + now_time)
-        print("debug {}".format(debug_time), end='\t')
+        # print("debug {}min {}sec".format(debug_time.tm_min, debug_time.tm_sec), end='\t')
         embedding = embed(essay, signature="default", as_dict=True)['elmo']
         sentence_rep = tf.reduce_mean(embedding, 1)  # [??, ???, 1024] => [??, 1024]
         df.loc[i] = [sess.run(sentence_rep).tolist(), len(essay), score]
@@ -85,7 +85,7 @@ def make_csv(index, essays, scores, train_or_valid):
 if __name__ == '__main__':
     batch_size_ = 100
 
-    with tf.device("/gpu:0"):
+    with tf.device("/cpu:0"):
         with tf.Graph().as_default():
             elmo_module_url = "https://tfhub.dev/google/elmo/2"
             embed = hub.Module(elmo_module_url)
