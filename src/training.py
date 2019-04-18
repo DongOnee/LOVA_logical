@@ -46,8 +46,9 @@ with tf.device("/gpu:0"):
 
         with tf.Session() as sess:
             # merged = tf.summary.merge_all()
-            train_writer = tf.summary.FileWriter('board/train', sess.graph)
-            valid_writer = tf.summary.FileWriter('board/valid')
+            now_time = time.time()
+            train_writer = tf.summary.FileWriter('board/train-'+str(now_time), sess.graph)
+            # valid_writer = tf.summary.FileWriter('board/valid-'+str(now_time))
 
             sess.run(tf.global_variables_initializer())
 
@@ -91,4 +92,4 @@ with tf.device("/gpu:0"):
                 saver.save(sess, "logic_models/dongs", global_step=global_step)
 
             train_writer.close()
-            valid_writer.close()
+            # valid_writer.close()
