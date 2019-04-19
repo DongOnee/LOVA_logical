@@ -46,9 +46,9 @@ with tf.device("/gpu:0"):
 
         with tf.Session() as sess:
             # merged = tf.summary.merge_all()
-            now_time = time.time()
-            train_writer = tf.summary.FileWriter('board/train-'+str(now_time), sess.graph)
-            # valid_writer = tf.summary.FileWriter('board/valid-'+str(now_time))
+            start_time = time.time()
+            train_writer = tf.summary.FileWriter('board/train-'+str(start_time), sess.graph)
+            # valid_writer = tf.summary.FileWriter('board/valid-'+str(start_time))
 
             sess.run(tf.global_variables_initializer())
 
@@ -89,7 +89,7 @@ with tf.device("/gpu:0"):
                 now_time = time.gmtime(now_time)
                 print("Epoch: {}/{}...\n".format(e + 1, epochs),
                       "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
-                saver.save(sess, "logic_models/dongs", global_step=global_step)
+                saver.save(sess, "logic_models/"+str(start_time), global_step=e)
 
             train_writer.close()
             # valid_writer.close()
