@@ -20,7 +20,7 @@ args = parser.parse_args()
 global_step = args.step
 lstm_size = [1024, 256]
 epochs = args.epochs
-lr = 0.01
+lr = 0.04
 batch_size_ = 100
 dataset_cnt = args.cntDataset
 
@@ -52,9 +52,9 @@ with tf.device("/gpu:0"):
 
             sess.run(tf.global_variables_initializer())
 
+            state = sess.run(lstm_cell.zero_state(batch_size_, tf.float32))
             for e in range(epochs):
                 now_time = -time.time()
-                state = sess.run(lstm_cell.zero_state(batch_size_, tf.float32))
                 for _index, (essays_, scores_) in enumerate(get_batches2(), 1):
                     lx = [len(xx) for xx in essays_]
                     llp = [[index, length - 1] for index, length in enumerate(lx)]
@@ -69,7 +69,7 @@ with tf.device("/gpu:0"):
                     }
                     loss_, state, _ = sess.run([loss_hist, lstm_final_state, optimizer], feed_dict=feed)
                     if _index % 20:
-                        train_writer.add_summary(loss_, _index)
+                        train_writer.add_summary(loss_, e*batch_size_+_index)
 
                     # if _index % 10 == 0:
                     #     pdValidPath = '../data/valid_preproc_'+str(_index//10)+'.csv'
