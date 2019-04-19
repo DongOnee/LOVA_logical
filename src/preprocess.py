@@ -30,9 +30,9 @@ def make_model(url):
     return input_sent, embedding
 
 
-def get_nom_score(prompt_id, score):
+def get_nom_score(prompt_id, scores_):
     min_, max_ = asap_ranges[prompt_id]
-    return (score-min_) / (max_ - min_)
+    return (scores_-min_) / (max_ - min_)
 
 
 def get_train_data(path, batch_size):
