@@ -30,7 +30,7 @@ def build_lstm_layers(lstm_sizes, embed, embed_len, batch_size, keep_prob_):
     lstms = [tf.contrib.rnn.LSTMCell(size, name='basic_lstm_cell') for size in lstm_sizes]  # [batch size, 100, cell.outputsize]
     drops = [tf.contrib.rnn.DropoutWrapper(lstm, output_keep_prob=keep_prob_) for lstm in lstms]
     cell = tf.contrib.rnn.MultiRNNCell(drops)
-    init_state = cell.zero_state(batch_size, tf.float32)
+    init_state = cell.zero_state(100, tf.float32)
 
     lstm_outputs, final_state = tf.nn.dynamic_rnn(cell, embed, initial_state=init_state, sequence_length=embed_len, dtype=tf.float32)
 

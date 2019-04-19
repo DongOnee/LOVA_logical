@@ -23,6 +23,13 @@ paths = ['../data/training_set_rel3.tsv',
          '../data/valid_sample_submission_2_column.csv']
 
 
+def make_model(url):
+    sentences = tf.placeholder(tf.string, [None], name='input')
+    elmo = hub.Module(url, trainable=False)
+    embeddings = elmo(sentences)
+    return sentences, embeddings
+
+
 def get_nom_score(prompt_id, score):
     min_, max_ = asap_ranges[prompt_id]
     return (score-min_) / (max_ - min_)
