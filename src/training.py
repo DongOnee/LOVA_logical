@@ -11,7 +11,7 @@ parser.add_argument("-s", "--step", dest="step", type=int, metavar='<int>', defa
                     help="saver global step number (default=5)")
 parser.add_argument("-e", "--epochs", dest="epochs", type=int, metavar='<int>', default=5,
                     help="Number of epochs (default=5)")
-parser.add_argument("-ds", "--data-set", dest="cntDataset", type=int, metavar='<int>', default=20,
+parser.add_argument("-ds", "--data-set", dest="dataset_count", type=int, metavar='<int>', default=20,
                     help="Number of data set (default=20)")
 args = parser.parse_args()
 
@@ -20,14 +20,14 @@ args = parser.parse_args()
 global_step = args.step
 lstm_size = [1024, 256]
 epochs = args.epochs
-lr = 0.04
+learning_rate = 0.04
 batch_size_ = 100
-dataset_cnt = args.cntDataset
+dataset_cnt = args.dataset_count
 
 print('#' * 5, "Global Step     :", global_step)
 print('#' * 5, "LSTM Cell Size  :", lstm_size)
 print('#' * 5, "Epochs          :", epochs)
-print('#' * 5, "Learning Rate   :", lr)
+print('#' * 5, "Learning Rate   :", learning_rate)
 print('#' * 5, "Batch Size      :", batch_size_)
 print('#' * 5, "Data Set Count  :", dataset_cnt)
 
@@ -37,7 +37,7 @@ with tf.device("/gpu:0"):
         # modeling
         essays, lengths, indice, scores, batch_size, keep_prob = model_inputs()
         lstm_outputs, lstm_cell, lstm_init_state, lstm_final_state = build_lstm_layers(lstm_size, essays, lengths, batch_size, keep_prob)
-        predictions, losses, optimizer = build_cost_fn_and_opt(lstm_outputs, indice, scores, lr)
+        predictions, losses, optimizer = build_cost_fn_and_opt(lstm_outputs, indice, scores, learning_rate)
 
         # to Tensorboard
         loss_hist = tf.summary.scalar('loss_hist', losses)
@@ -55,13 +55,13 @@ with tf.device("/gpu:0"):
             state = sess.run(lstm_cell.zero_state(batch_size_, tf.float32))
             for e in range(epochs):
                 now_time = -time.time()
-                for _index, (essays_, scores_) in enumerate(get_batches2(), 1):
-                    lx = [len(xx) for xx in essays_]
-                    llp = [[index, length - 1] for index, length in enumerate(lx)]
+                for _index, (essays_, scores_) in enumerate(get_batches2(dataset_cnt), 1):
+                    essay_lengths = [len(xx) for xx in essays_]
+                    essay_indice = [[index, length - 1] for index, length in enumerate(essay_lengths)]
                     feed = {
                         essays:        essays_,
-                        lengths:       lx,
-                        indice:        llp,
+                        lengths:       essay_lengths,
+                        indice:        essay_indice,
                         scores:        [[score] for score in scores_],
                         batch_size:    batch_size_,
                         lstm_init_state: state,

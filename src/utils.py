@@ -97,8 +97,8 @@ def get_data_set(file_path):
     return outx, lx, y
 
 
-def get_batches2():
-    filepaths = glob.glob("../data/train_preproc_*")
+def get_batches2(file_cnt=-1):
+    filepaths = glob.glob("../data/train_preproc_*")[:file_cnt]
 
     for filepath in filepaths:
         tmp = pd.read_csv(filepath).values
