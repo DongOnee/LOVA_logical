@@ -13,28 +13,27 @@ def model_inputs():
     scores_ = tf.placeholder(tf.float32, [None, 1], name='scores')
     lens_ = tf.placeholder(tf.int32, [None], name='essay_lengths')
     indice_ = tf.placeholder(tf.int32, [None, 2], name='indice')
-    batch_size_ = tf.placeholder(tf.int32, name='batch_size')
     keep_prob_ = tf.placeholder(tf.float32, name='keep_prob')
 
-    return inputs_, lens_, indice_, scores_, batch_size_, keep_prob_
+    return inputs_, lens_, indice_, scores_, keep_prob_
 
 
-def build_lstm_layers(lstm_sizes, embed, embed_len, batch_size, keep_prob_):
+def build_lstm_layers(sentences, sentences_length, hidden_layer, keep_prob_):
     """
     Create the LSTM layers
     :parm "lstm_sizes"  : stacked lstm hidden layer size
     :parm "embed"       : embedded sentences vector representation
     :parm "keep_prob_"  : drop out value
     """
-    embed = tf.reshape(embed, [batch_size, 100, 1024])
-    lstms = [tf.contrib.rnn.LSTMCell(size, name='basic_lstm_cell') for size in lstm_sizes]  # [batch size, 100, cell.outputsize]
+    embed = tf.reshape(sentences, [-1, 100, 1024])
+    lstms = [tf.contrib.rnn.LSTMCell(layer, name='basic_lstm_cell') for layer in hidden_layer]
     drops = [tf.contrib.rnn.DropoutWrapper(lstm, output_keep_prob=keep_prob_) for lstm in lstms]
     cell = tf.contrib.rnn.MultiRNNCell(drops)
     init_state = cell.zero_state(100, tf.float32)
 
-    lstm_outputs, final_state = tf.nn.dynamic_rnn(cell, embed, initial_state=init_state, sequence_length=embed_len, dtype=tf.float32)
+    outputs, states = tf.nn.dynamic_rnn(cell, embed, initial_state=init_state, sequence_length=sentences_length)
 
-    return lstm_outputs, cell, init_state, final_state
+    return outputs, cell, init_state, states
 
 
 def build_cost_fn_and_opt(lstm_outputs, indice,  scores_, learning_rate):

@@ -20,7 +20,7 @@ args = parser.parse_args()
 global_step = args.step
 lstm_size = [1024, 256]
 epochs = args.epochs
-learning_rate = 0.04
+learning_rate = 0.004
 batch_size_ = 100
 dataset_cnt = args.dataset_count
 
@@ -35,9 +35,9 @@ print("graph on")
 with tf.device("/gpu:0"):
     with tf.Graph().as_default():
         # modeling
-        essays, lengths, indice, scores, batch_size, keep_prob = model_inputs()
-        lstm_outputs, lstm_cell, lstm_init_state, lstm_final_state = build_lstm_layers(lstm_size, essays, lengths, batch_size, keep_prob)
-        predictions, losses, optimizer = build_cost_fn_and_opt(lstm_outputs, indice, scores, learning_rate)
+        essays, lengths, indice, scores, keep_prob = model_inputs()
+        outputs, cell, init_state, final_states = build_lstm_layers(essays, lengths, lstm_size, keep_prob)
+        predictions, losses, optimizer = build_cost_fn_and_opt(outputs, indice, scores, learning_rate)
 
         # to Tensorboard
         loss_hist = tf.summary.scalar('loss_hist', losses)
@@ -48,48 +48,47 @@ with tf.device("/gpu:0"):
             # merged = tf.summary.merge_all()
             start_time = int(time.time())
             train_writer = tf.summary.FileWriter('board/train-'+str(start_time), sess.graph)
-            # valid_writer = tf.summary.FileWriter('board/valid-'+str(start_time))
+            valid_writer = tf.summary.FileWriter('board/valid-'+str(start_time), sess.graph)
 
             sess.run(tf.global_variables_initializer())
-
-            state = sess.run(lstm_cell.zero_state(batch_size_, tf.float32))
+            state = sess.run(init_state)
             for e in range(epochs):
                 now_time = -time.time()
-                for _index, (essays_, scores_) in enumerate(get_batches2(dataset_cnt), 1):
-                    essay_lengths = [len(xx) for xx in essays_]
-                    essay_indice = [[index, length - 1] for index, length in enumerate(essay_lengths)]
+                for _index, (essays_, length_, scores_) in enumerate(get_batches3(dataset_cnt), 1):
+                    essay_indice = [[index, length - 1] for index, length in enumerate(length_)]
                     feed = {
-                        essays:        essays_,
-                        lengths:       essay_lengths,
-                        indice:        essay_indice,
-                        scores:        [[score] for score in scores_],
-                        batch_size:    batch_size_,
-                        lstm_init_state: state,
-                        keep_prob:     0.5
+                        essays:     essays_,
+                        lengths:    length_,
+                        indice:     essay_indice,
+                        scores:     [[score] for score in scores_],
+                        init_state: state,
+                        keep_prob:  0.5
                     }
-                    loss_, state, _ = sess.run([loss_hist, lstm_final_state, optimizer], feed_dict=feed)
+                    loss_, state, _ = sess.run([loss_hist, final_states, optimizer], feed_dict=feed)
                     if _index % 20 == 0:
                         train_writer.add_summary(loss_, e*dataset_cnt+_index)
-
-                    # if _index % 10 == 0:
-                    #     pdValidPath = '../data/valid_preproc_'+str(_index//10)+'.csv'
-                    #     vx, vlx, vy = get_data_set(pdValidPath)
-                    #     val_state = sess.run(lstmCell.zero_state(batchSize, tf.float32))
-                    #     vllp = [[index, length - 1] for index, length in enumerate(vlx)]
-                    #     feed = {essaysTensor:       vx,
-                    #             essaysLength:       vlx,
-                    #             essaysLength2:      vllp,
-                    #             essaysScore:        vy,
-                    #             batchSizeTensor:    batchSize,
-                    #             keepProbTensor:     1}
-                    #     val_loss, val_state = sess.run([loss_hist, lstmFinalState], feed_dict=feed)
-                    #     valid_writer.add_summary(val_loss, _index*batchSize)
 
                 now_time += time.time()
                 now_time = time.gmtime(now_time)
                 print("Epoch: {}/{}...\n".format(e + 1, epochs),
                       "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
-                saver.save(sess, "logic_models/"+str(start_time), global_step=e)
+
+            # test
+            for _index, (essays_, length_, scores_) in enumerate(get_batches3("valid"), 1):
+                essay_indice = [[index, length - 1] for index, length in enumerate(length_)]
+                feed = {
+                    essays:     essays_,
+                    lengths:    length_,
+                    indice:     essay_indice,
+                    scores:     [[score] for score in scores_],
+                    init_state: state,
+                    keep_prob:  1
+                }
+                loss_ = sess.run(loss_hist, feed_dict=feed)
+                if _index % 20 == 0:
+                    valid_writer.add_summary(loss_, _index)
+
+            saver.save(sess, "logic_models/" + str(start_time), global_step=e)
 
             train_writer.close()
-            # valid_writer.close()
+            valid_writer.close()
