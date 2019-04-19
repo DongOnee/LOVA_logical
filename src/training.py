@@ -20,7 +20,7 @@ args = parser.parse_args()
 global_step = args.step
 lstm_size = [1024, 256]
 epochs = args.epochs
-learning_rate = 0.004
+learning_rate = 0.04
 batch_size_ = 100
 dataset_cnt = args.dataset_count
 
@@ -39,18 +39,18 @@ with tf.device("/gpu:0"):
         outputs, cell, init_state, final_states = build_lstm_layers(essays, lengths, lstm_size, keep_prob)
         predictions, losses, optimizer = build_cost_fn_and_opt(outputs, indice, scores, learning_rate)
 
-        # to Tensorboard
+        # to Tensorboard, saver
         loss_hist = tf.summary.scalar('loss_hist', losses)
-        # to saver
         saver = tf.train.Saver()
 
         with tf.Session() as sess:
-            # merged = tf.summary.merge_all()
+            # Tensorboard Writer
             start_time = int(time.time())
             train_writer = tf.summary.FileWriter('board/train-'+str(start_time), sess.graph)
-            valid_writer = tf.summary.FileWriter('board/valid-'+str(start_time), sess.graph)
-
+            test_writer = tf.summary.FileWriter('board/valid-'+str(start_time), sess.graph)
             sess.run(tf.global_variables_initializer())
+
+            # train
             state = sess.run(init_state)
             for e in range(epochs):
                 now_time = -time.time()
@@ -85,10 +85,9 @@ with tf.device("/gpu:0"):
                     keep_prob:  1
                 }
                 loss_ = sess.run(loss_hist, feed_dict=feed)
-                if _index % 20 == 0:
-                    valid_writer.add_summary(loss_, _index)
+                test_writer.add_summary(loss_, _index)
 
-            saver.save(sess, "logic_models/" + str(start_time), global_step=e)
+            saver.save(sess, "logic_models/" + str(start_time))
 
             train_writer.close()
-            valid_writer.close()
+            test_writer.close()
