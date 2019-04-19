@@ -20,7 +20,7 @@ args = parser.parse_args()
 global_step = args.step
 lstm_size = [1024, 256]
 epochs = args.epochs
-learning_rate = 0.04
+learning_rate = 0.4
 batch_size_ = 100
 dataset_cnt = args.dataset_count
 
@@ -74,7 +74,7 @@ with tf.device("/gpu:0"):
                       "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
 
             # test
-            for _index, (essays_, length_, scores_) in enumerate(get_batches3("valid"), 1):
+            for _index, (essays_, length_, scores_) in enumerate(get_batches3(train_or_valid="valid"), 1):
                 essay_indice = [[index, length - 1] for index, length in enumerate(length_)]
                 feed = {
                     essays:     essays_,
