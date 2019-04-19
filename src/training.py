@@ -64,7 +64,8 @@ with tf.device("/gpu:0"):
                         init_state: state,
                         keep_prob:  0.5
                     }
-                    loss_, state, _ = sess.run([loss_hist, final_states, optimizer], feed_dict=feed)
+                    preds, loss_, state, _ = sess.run([predictions, loss_hist, final_states, optimizer], feed_dict=feed)
+                    print(preds, scores_)
                     if _index % 20 == 0:
                         train_writer.add_summary(loss_, e*dataset_cnt+_index)
 
