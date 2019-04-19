@@ -20,7 +20,7 @@ args = parser.parse_args()
 global_step = args.step
 lstm_size = [1024, 256]
 epochs = args.epochs
-lr = 0.001
+lr = 0.0004
 batch_size_ = 100
 dataset_cnt = args.cntDataset
 
