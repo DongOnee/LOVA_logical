@@ -46,7 +46,7 @@ with tf.device("/gpu:0"):
 
         with tf.Session() as sess:
             # merged = tf.summary.merge_all()
-            start_time = time.time()
+            start_time = int(time.time())
             train_writer = tf.summary.FileWriter('board/train-'+str(start_time), sess.graph)
             # valid_writer = tf.summary.FileWriter('board/valid-'+str(start_time))
 
@@ -67,7 +67,8 @@ with tf.device("/gpu:0"):
                         lstm_init_state: state,
                         keep_prob:     0.5
                     }
-                    loss_, state, _ = sess.run([loss_hist, lstm_final_state, optimizer], feed_dict=feed)
+                    pre, loss_, state, _ = sess.run([predictions, loss_hist, lstm_final_state, optimizer], feed_dict=feed)
+                    print(pre)
                     if _index % 20:
                         train_writer.add_summary(loss_, _index)
 

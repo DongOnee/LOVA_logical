@@ -24,10 +24,10 @@ paths = ['../data/training_set_rel3.tsv',
 
 
 def make_model(url):
-    sentences = tf.placeholder(tf.string, [None], name='input')
-    elmo = hub.Module(url, trainable=False)
-    embeddings = elmo(sentences, signature="default", as_dict=True)['default']
-    return sentences, embeddings
+    input_sent = tf.placeholder(tf.string, [None], name='input')
+    elmo_module = hub.Module(url, trainable=False)
+    embedding = elmo_module(input_sent, signature="default", as_dict=True)['default']
+    return input_sent, embedding
 
 
 def get_nom_score(prompt_id, score):
