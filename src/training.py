@@ -20,7 +20,7 @@ args = parser.parse_args()
 global_step = args.step
 lstm_size = [1024, 256]
 epochs = args.epochs
-lr = 0.0004
+lr = 0.01
 batch_size_ = 100
 dataset_cnt = args.cntDataset
 
@@ -67,8 +67,7 @@ with tf.device("/gpu:0"):
                         lstm_init_state: state,
                         keep_prob:     0.5
                     }
-                    pre, loss_, state, _ = sess.run([predictions, loss_hist, lstm_final_state, optimizer], feed_dict=feed)
-                    print(pre)
+                    loss_, state, _ = sess.run([loss_hist, lstm_final_state, optimizer], feed_dict=feed)
                     if _index % 20:
                         train_writer.add_summary(loss_, _index)
 
