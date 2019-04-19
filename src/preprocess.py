@@ -81,21 +81,32 @@ if __name__ == '__main__':
             with tf.Session() as sess:
                 sess.run(tf.global_variables_initializer())
 
-                print("Train Data Preprocessing")
-                for batch_count, (essays, scores) in enumerate(get_train_data(paths[0], batch_size_), 1):
+                # print("Train Data Preprocessing")
+                # for batch_count, (essays, scores) in enumerate(get_train_data(paths[0], batch_size_), 1):
+                #     now_time = -time.time()
+                #     df = pd.DataFrame(columns=['essay', 'lengths', 'score'])
+                #     for i, (essay, score) in enumerate(zip(essays, scores), 1):
+                #         sentence_rep = sess.run(embeddings, feed_dict={sentences: essay})
+                #         df.loc[i] = [sentence_rep.tolist(), len(essay), score]
+                #     df.to_csv('../preproc/train_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
+                #     del [[df]]
+                #     gc.collect()
+                #     now_time += time.time()
+                #     now_time = time.gmtime(now_time)
+                #     print("Count: {}...\n".format(batch_count),
+                #           "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
+
+                print("Valid Data Preprocessing")
+                for batch_count, (essays, scores) in enumerate(get_valid_data(paths[1], paths[2], batch_size_), 1):
                     now_time = -time.time()
                     df = pd.DataFrame(columns=['essay', 'lengths', 'score'])
                     for i, (essay, score) in enumerate(zip(essays, scores), 1):
                         sentence_rep = sess.run(embeddings, feed_dict={sentences: essay})
                         df.loc[i] = [sentence_rep.tolist(), len(essay), score]
-                    df.to_csv('../preproc/train_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
+                    df.to_csv('../preproc/valid_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
                     del [[df]]
                     gc.collect()
                     now_time += time.time()
                     now_time = time.gmtime(now_time)
                     print("Count: {}...\n".format(batch_count),
                           "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
-
-                print("Valid Data Preprocessing")
-                # for batch_count, (essays, scores) in enumerate(get_valid_data(paths[1], paths[2], batch_size_), 1):
-                #     make_csv(batch_count, essays, scores, "valid")
