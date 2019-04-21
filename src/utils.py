@@ -128,3 +128,15 @@ def get_batches3(file_cnt=-1, train_or_valid="train"):
         del [[tmp]]
         yield x, lens, y
 
+
+def get_batches4(file_cnt=-1, train_or_valid="train"):
+    filepaths = glob.glob("../preproc2/"+train_or_valid+"_preproc_*")[:file_cnt]
+
+    for filepath in filepaths:
+        tmp = pd.read_csv(filepath).values
+        x = tmp[:, 0]
+        lens = tmp[:, 1]
+        y = tmp[:, 2]
+        del [[tmp]]
+        yield x, lens, y
+
