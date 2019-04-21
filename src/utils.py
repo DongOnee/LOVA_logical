@@ -173,7 +173,7 @@ def parallelize_dataframe(train_or_valid="train", batch_size=100):
     for index_batch in range(n_batchs):
         essays_, lengths_, scores_= list(), list(), list()
         for index_loop in range(loop_count):
-            ret = pool.map(load_data, filepaths[batch_size * index_batch + index_loop * loop_count:batch_size * index_batch + (index_loop+1) * loop_count])
+            ret = pool.map(load_data, filepaths[batch_size * index_batch + index_loop * num_cores:batch_size * index_batch + (index_loop+1) * num_cores])
             pool.close()
             pool.join()
             for sibal in ret:
