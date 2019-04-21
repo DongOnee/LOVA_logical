@@ -141,8 +141,8 @@ def get_batches4(file_cnt=-1, train_or_valid="train"):
         yield x, lens, y
 
 
-def get_batches5(file_cnt=-1, train_or_valid="train", batch_size=100):
-    filepaths = glob.glob("../preproc3/"+train_or_valid+"_preproc_*")[:file_cnt]
+def get_batches5(train_or_valid="train", batch_size=100):
+    filepaths = glob.glob("../preproc3/"+train_or_valid+"_preproc_*")
 
     essays, lengths, scores = list(), list(), list()
     for count, filepath in enumerate(filepaths, 1):

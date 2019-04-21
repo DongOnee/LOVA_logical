@@ -55,11 +55,11 @@ with tf.device("/gpeu:0"):
             state = sess.run(init_state)
             for e in range(epochs):
                 now_time = -time.time()
-                for _index, (essays_, length_, scores_) in enumerate(get_batches3(dataset_cnt), 1):
-                    essay_indice = [[index, length - 1] for index, length in enumerate(length_)]
+                for _index, (essays_, lengths_, scores_) in enumerate(get_batches5(batch_size=batch_size_), 1):
+                    essay_indice = [[index, length - 1] for index, length in enumerate(lengths_)]
                     feed = {
                         essays:     essays_,
-                        lengths:    length_,
+                        lengths:    lengths_,
                         indice:     essay_indice,
                         scores:     [[score] for score in scores_],
                         init_state: state,
@@ -76,11 +76,11 @@ with tf.device("/gpeu:0"):
                       "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
 
             # test
-            for _index, (essays_, length_, scores_) in enumerate(get_batches3(train_or_valid="valid"), 1):
-                essay_indice = [[index, length - 1] for index, length in enumerate(length_)]
+            for _index, (essays_, lengths_, scores_) in enumerate(get_batches5(train_or_valid="valid", batch_size=batch_size_), 1):
+                essay_indice = [[index, length - 1] for index, length in enumerate(lengths_)]
                 feed = {
                     essays:     essays_,
-                    lengths:    length_,
+                    lengths:    lengths_,
                     indice:     essay_indice,
                     scores:     [[score] for score in scores_],
                     init_state: state,
