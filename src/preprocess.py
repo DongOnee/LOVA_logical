@@ -87,8 +87,10 @@ if __name__ == '__main__':
                     df = pd.DataFrame(columns=['essay', 'lengths', 'score'])
                     for i, (essay, score) in enumerate(zip(essays, scores), 1):
                         sentence_rep = sess.run(embeddings, feed_dict={sentences: essay})
-                        df.loc[i] = [sentence_rep.tolist(), len(essay), score]
-                    df.to_csv('../preproc/train_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
+                        pad = [[0] * 1024 for _ in range(100)]
+                        pad[:len(essay)] = sentence_rep.tolist()
+                        df.loc[i] = [pad, len(essay), score]
+                    df.to_csv('../preproc2/train_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
                     del [[df]]
                     gc.collect()
                     now_time += time.time()
@@ -102,8 +104,11 @@ if __name__ == '__main__':
                     df = pd.DataFrame(columns=['essay', 'lengths', 'score'])
                     for i, (essay, score) in enumerate(zip(essays, scores), 1):
                         sentence_rep = sess.run(embeddings, feed_dict={sentences: essay})
-                        df.loc[i] = [sentence_rep.tolist(), len(essay), score]
-                    df.to_csv('../preproc/valid_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
+                        pad = [[0] * 1024 for _ in range(100)]
+                        pad[:len(essay)] = sentence_rep.tolist()
+                        df.loc[i] = [pad, len(essay), score]
+                        # df.loc[i] = [sentence_rep.tolist(), len(essay), score]
+                    df.to_csv('../preproc2/valid_preproc_' + str(batch_count).zfill(4) + '.csv', index=False)
                     del [[df]]
                     gc.collect()
                     now_time += time.time()

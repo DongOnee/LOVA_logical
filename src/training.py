@@ -32,7 +32,7 @@ print('#' * 5, "Batch Size      :", batch_size_)
 print('#' * 5, "Data Set Count  :", dataset_cnt)
 
 print("graph on")
-with tf.device("/gpu:0"):
+with tf.device("/gpeu:0"):
     with tf.Graph().as_default():
         # modeling
         essays, lengths, indice, scores, keep_prob = model_inputs()
