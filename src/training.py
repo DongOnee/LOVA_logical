@@ -18,7 +18,7 @@ args = parser.parse_args()
 ###############
 # Hyper params
 global_step = args.step
-lstm_size = [1024, 256]
+lstm_size = [1024, 256, 1]
 epochs = args.epochs
 learning_rate = 0.4
 batch_size_ = 100
@@ -62,8 +62,7 @@ with tf.device("/gpu:0"):
                         init_state: state,
                         keep_prob:  0.5
                     }
-                    preds, loss_, state, _ = sess.run([predictions, loss_hist, final_states, optimizer], feed_dict=feed)
-                    print(preds, scores_)
+                    loss_, state, _ = sess.run([loss_hist, final_states, optimizer], feed_dict=feed)
                     if _index % 20 == 0:
                         train_writer.add_summary(loss_)
 
@@ -73,6 +72,7 @@ with tf.device("/gpu:0"):
                       "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
 
             # test
+            now_time = -time.time()
             for _index, (essays_, lengths_, scores_) in enumerate(get_batches5(train_or_valid="valid", batch_size=batch_size_), 1):
                 essay_indice = [[index, length - 1] for index, length in enumerate(lengths_)]
                 feed = {
@@ -85,6 +85,9 @@ with tf.device("/gpu:0"):
                 }
                 loss_ = sess.run(loss_hist, feed_dict=feed)
                 test_writer.add_summary(loss_)
+            now_time += time.time()
+            now_time = time.gmtime(now_time)
+            print("Test Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
 
             saver.save(sess, "logic_models/" + str(start_time))
 

@@ -44,8 +44,9 @@ def build_cost_fn_and_opt(lstm_outputs, indice,  scores_, learning_rate):
     :parm "scores_"         : true score value
     :parm "learning_rate"   : learning rate
     """
-    last_sentences = tf.gather_nd(lstm_outputs, indice)  # [batchsize, cell.outputsize]
-    predictions = tf.contrib.layers.fully_connected(last_sentences, 1, activation_fn=tf.sigmoid)
+    # last_sentences
+    predictions = tf.gather_nd(lstm_outputs, indice)  # [batchsize, cell.outputsize]
+    # predictions = tf.contrib.layers.fully_connected(last_sentences, 1, activation_fn=tf.sigmoid)
 
     # loss = tf.losses.sum_squared_error(scores_, predictions)
     loss = tf.reduce_sum(tf.square(predictions - scores_))
