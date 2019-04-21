@@ -84,10 +84,10 @@ if __name__ == '__main__':
                     sentence_rep = sess.run(embeddings, feed_dict={sentences: essay})
                     pad = [[0] * 1024 for _ in range(100)]
                     pad[:len(essay)] = sentence_rep.tolist()
-                    df.append(pad)
+                    df = df.append(pad)
                     pad = [0] * 1024
                     pad[:2] = [len(essay), score]
-                    df.append(pad)
+                    df.loc[100] = pad
                     df.to_csv('../preproc3/train_preproc_' + str(file_count).zfill(5) + '.csv', index=False)
                     del [[df]]
                     gc.collect()
@@ -103,10 +103,10 @@ if __name__ == '__main__':
                     sentence_rep = sess.run(embeddings, feed_dict={sentences: essay})
                     pad = [[0] * 1024 for _ in range(100)]
                     pad[:len(essay)] = sentence_rep.tolist()
-                    df.append(pad)
+                    df = df.append(pad)
                     pad = [0] * 1024
                     pad[:2] = [len(essay), score]
-                    df.append(pad)
+                    df.loc[100] = pad
                     df.to_csv('../preproc3/valid_preproc_' + str(file_count).zfill(5) + '.csv', index=False)
                     del [[df]]
                     gc.collect()

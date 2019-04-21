@@ -140,3 +140,22 @@ def get_batches4(file_cnt=-1, train_or_valid="train"):
         del [[tmp]]
         yield x, lens, y
 
+
+def get_batches5(file_cnt=-1, train_or_valid="train", batch_size=100):
+    filepaths = glob.glob("../preproc3/"+train_or_valid+"_preproc_*")[:file_cnt]
+
+    essays, lengths, scores = list(), list(), list()
+    for count, filepath in enumerate(filepaths, 1):
+        tmp = pd.read_csv(filepath).values
+        x = tmp[:100]
+        essays.append(x)
+        len = tmp[-1, 0]
+        lengths.append(len)
+        y = tmp[-1, 1]
+        del [[tmp]]
+        scores.append(y)
+        if count % batch_size == 0:
+            yield essays, lengths, scores
+            essays.clear()
+            lengths.clear()
+            scores.clear()
