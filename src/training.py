@@ -11,8 +11,6 @@ parser.add_argument("-s", "--step", dest="step", type=int, metavar='<int>', defa
                     help="saver global step number (default=5)")
 parser.add_argument("-e", "--epochs", dest="epochs", type=int, metavar='<int>', default=5,
                     help="Number of epochs (default=5)")
-parser.add_argument("-ds", "--data-set", dest="dataset_count", type=int, metavar='<int>', default=20,
-                    help="Number of data set (default=20)")
 args = parser.parse_args()
 
 ###############
@@ -52,7 +50,7 @@ with tf.device("/gpu:0"):
                 now_time = -time.time()
                 batch_time = -time.time()
                 train_writer = tf.summary.FileWriter('board/train-'+str(e)+'-'+str(start_time), sess.graph)
-                for _index, (essays_, lengths_, scores_) in enumerate(get_batches5(batch_size=batch_size_), 1):
+                for _index, (essays_, lengths_, scores_) in enumerate(parallelize_dataframe(batch_size=batch_size_), 1):
                     get_batches_time = batch_time + time.time()
                     get_batches_time = time.gmtime(get_batches_time)
                     print("load data Time: {}min {}sec...".format(get_batches_time.tm_min, get_batches_time.tm_sec))
@@ -81,7 +79,7 @@ with tf.device("/gpu:0"):
             # test
             now_time = -time.time()
             test_writer = tf.summary.FileWriter('board/valid-'+str(start_time), sess.graph)
-            for _index, (essays_, lengths_, scores_) in enumerate(get_batches5(train_or_valid="valid", batch_size=batch_size_), 1):
+            for _index, (essays_, lengths_, scores_) in enumerate(parallelize_dataframe(train_or_valid="valid", batch_size=batch_size_), 1):
                 essay_indice = [[index, length - 1] for index, length in enumerate(lengths_)]
                 feed = {
                     essays:     essays_,

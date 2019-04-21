@@ -4,6 +4,7 @@ import tensorflow as tf
 import pandas as pd
 from ast import literal_eval
 import glob
+from multiprocessing import Pool
 
 asap_ranges = {
     0: (0, 60),
@@ -159,3 +160,29 @@ def get_batches5(train_or_valid="train", batch_size=100):
             essays.clear()
             lengths.clear()
             scores.clear()
+
+
+def parallelize_dataframe(train_or_valid="train", batch_size=100):
+    num_cores = 10
+    pool = Pool(num_cores)
+
+    filepaths = glob.glob("../preproc3/" + train_or_valid + "_preproc_*")
+    file_count = len(filepaths)
+    n_batchs = file_count // batch_size
+    loop_count = batch_size // num_cores
+    for index_batch in range(n_batchs):
+        essays_, lengths_, scores_= list(), list(), list()
+        for index_loop in range(loop_count):
+            ret = pool.map(load_data, filepaths[batch_size * index_batch + index_loop * loop_count:batch_size * index_batch + (index_loop+1) * loop_count])
+            pool.close()
+            pool.join()
+            for sibal in ret:
+                essays_.append(sibal[0])
+                lengths_.append(sibal[1])
+                scores_.append(sibal[2])
+        yield essays_, lengths_, scores_
+
+
+def load_data(preproc_path):
+    df = pd.read_csv(preproc_path).values
+    return df[:100], df[-1, 0], df[-1, 1]
