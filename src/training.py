@@ -3,7 +3,6 @@ from models import *
 from utils import *
 import tensorflow as tf
 import time
-from ast import literal_eval
 
 ###############
 # argument
@@ -23,17 +22,15 @@ lstm_size = [1024, 256]
 epochs = args.epochs
 learning_rate = 0.4
 batch_size_ = 100
-dataset_cnt = args.dataset_count
 
 print('#' * 5, "Global Step     :", global_step)
 print('#' * 5, "LSTM Cell Size  :", lstm_size)
 print('#' * 5, "Epochs          :", epochs)
 print('#' * 5, "Learning Rate   :", learning_rate)
 print('#' * 5, "Batch Size      :", batch_size_)
-print('#' * 5, "Data Set Count  :", dataset_cnt)
 
 print("graph on")
-with tf.device("/gpeu:0"):
+with tf.device("/gpu:0"):
     with tf.Graph().as_default():
         # modeling
         essays, lengths, indice, scores, keep_prob = model_inputs()
