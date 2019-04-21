@@ -68,7 +68,7 @@ with tf.device("/gpeu:0"):
                     preds, loss_, state, _ = sess.run([predictions, loss_hist, final_states, optimizer], feed_dict=feed)
                     print(preds, scores_)
                     if _index % 20 == 0:
-                        train_writer.add_summary(loss_, e*dataset_cnt+_index)
+                        train_writer.add_summary(loss_)
 
                 now_time += time.time()
                 now_time = time.gmtime(now_time)
@@ -87,7 +87,7 @@ with tf.device("/gpeu:0"):
                     keep_prob:  1
                 }
                 loss_ = sess.run(loss_hist, feed_dict=feed)
-                test_writer.add_summary(loss_, _index)
+                test_writer.add_summary(loss_)
 
             saver.save(sess, "logic_models/" + str(start_time))
 
