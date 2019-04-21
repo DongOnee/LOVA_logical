@@ -44,15 +44,18 @@ with tf.device("/gpu:0"):
         with tf.Session() as sess:
             # Tensorboard Writer
             start_time = int(time.time())
-            train_writer = tf.summary.FileWriter('board/train-'+str(start_time), sess.graph)
-            test_writer = tf.summary.FileWriter('board/valid-'+str(start_time), sess.graph)
             sess.run(tf.global_variables_initializer())
 
             # train
             state = sess.run(init_state)
             for e in range(epochs):
                 now_time = -time.time()
+                batch_time = -time.time()
+                train_writer = tf.summary.FileWriter('board/train-'+str(e)+'-'+str(start_time), sess.graph)
                 for _index, (essays_, lengths_, scores_) in enumerate(get_batches5(batch_size=batch_size_), 1):
+                    get_batches_time = batch_time + time.time()
+                    get_batches_time = time.gmtime(get_batches_time)
+                    print("load data Time: {}min {}sec...".format(get_batches_time.tm_min, get_batches_time.tm_sec))
                     essay_indice = [[index, length - 1] for index, length in enumerate(lengths_)]
                     feed = {
                         essays:     essays_,
@@ -63,6 +66,10 @@ with tf.device("/gpu:0"):
                         keep_prob:  0.5
                     }
                     loss_, state, _ = sess.run([loss_hist, final_states, optimizer], feed_dict=feed)
+                    get_batches_time = batch_time + time.time()
+                    get_batches_time = time.gmtime(get_batches_time)
+                    print("sess run Time: {}min {}sec...".format(get_batches_time.tm_min, get_batches_time.tm_sec))
+                    batch_time = -time.time()
                     if _index % 20 == 0:
                         train_writer.add_summary(loss_)
 
@@ -73,6 +80,7 @@ with tf.device("/gpu:0"):
 
             # test
             now_time = -time.time()
+            test_writer = tf.summary.FileWriter('board/valid-'+str(start_time), sess.graph)
             for _index, (essays_, lengths_, scores_) in enumerate(get_batches5(train_or_valid="valid", batch_size=batch_size_), 1):
                 essay_indice = [[index, length - 1] for index, length in enumerate(lengths_)]
                 feed = {
