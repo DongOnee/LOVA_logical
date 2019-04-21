@@ -179,6 +179,7 @@ def parallelize_dataframe(train_or_valid="train", batch_size=100):
             pool.close()
             pool.join()
             for sibal in multiple_results:
+                print(sibal)
                 essays_.append(sibal[0])
                 lengths_.append(sibal[1])
                 scores_.append(sibal[2])
