@@ -165,7 +165,6 @@ def get_batches5(train_or_valid="train", batch_size=100):
 
 def parallelize_dataframe(train_or_valid="train", batch_size=100):
     num_cores = 10
-    pool = Pool(num_cores)
 
     filepaths = glob.glob("../preproc3/" + train_or_valid + "_preproc_*")
     file_count = len(filepaths)
@@ -176,7 +175,7 @@ def parallelize_dataframe(train_or_valid="train", batch_size=100):
         for index_loop in range(loop_count):
             # ret = [pool.apply_async(os.getpid, ()) for i in range(10)]
             ret = list()
-            pool.start()
+            pool = Pool(num_cores)
             ret.extend(pool.map(load_data, filepaths[batch_size * index_batch + index_loop * num_cores:batch_size * index_batch + (index_loop+1) * num_cores]))
             pool.close()
             pool.join()
