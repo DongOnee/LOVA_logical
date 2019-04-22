@@ -48,7 +48,7 @@ def build_cost_fn_and_opt(lstm_outputs, indice,  scores_, learning_rate):
     predictions = tf.gather_nd(lstm_outputs, indice)  # [batchsize, cell.outputsize]
     # predictions = tf.contrib.layers.fully_connected(last_sentences, 1, activation_fn=tf.sigmoid)
 
-    loss = tf.losses.sum_squared_error(scores_, predictions)
+    loss = tf.losses.mean_squared_error(scores_, predictions)
     # loss = tf.reduce_sum(tf.square(predictions - scores_))
     optimzer = tf.train.AdamOptimizer(learning_rate).minimize(loss)
 
