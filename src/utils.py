@@ -179,8 +179,9 @@ def parallelize_dataframe(train_or_valid="train", batch_size=100):
             ret.append(pool.map(load_data, filepaths[batch_size * index_batch + index_loop * num_cores:batch_size * index_batch + (index_loop+1) * num_cores]))
             pool.close()
             pool.join()
+            print(ret)
             for sibal in ret:
-                print(sibal)
+                # print(sibal)
                 essays_.append(sibal[0])
                 lengths_.append(sibal[1])
                 scores_.append(sibal[2])
