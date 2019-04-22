@@ -176,12 +176,12 @@ def parallelize_dataframe(train_or_valid="train", batch_size=100):
         for index_loop in range(loop_count):
             # ret = [pool.apply_async(os.getpid, ()) for i in range(10)]
             ret = list()
-            ret.append(pool.map(load_data, filepaths[batch_size * index_batch + index_loop * num_cores:batch_size * index_batch + (index_loop+1) * num_cores]))
+            ret.extend(pool.map(load_data, filepaths[batch_size * index_batch + index_loop * num_cores:batch_size * index_batch + (index_loop+1) * num_cores]))
             pool.close()
             pool.join()
-            print(ret)
+            # print(ret)
             for sibal in ret:
-                # print(sibal)
+                print(sibal)
                 essays_.append(sibal[0])
                 lengths_.append(sibal[1])
                 scores_.append(sibal[2])
