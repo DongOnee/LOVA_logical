@@ -9,3 +9,4 @@ src/logic_models/*
 .DS_Store
 .idea
 tmp*
+*ipynb
