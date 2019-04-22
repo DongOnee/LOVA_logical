@@ -53,7 +53,7 @@ with tf.device("/gpu:0"):
                 for _index, (essays_, lengths_, scores_) in enumerate(parallelize_dataframe(batch_size=batch_size_), 1):
                     get_batches_time = batch_time + time.time()
                     get_batches_time = time.gmtime(get_batches_time)
-                    print("load data Time: {}min {}sec...".format(get_batches_time.tm_min, get_batches_time.tm_sec))
+                    print("load data Time: {}sec...".format(get_batches_time.tm_sec))
                     essay_indice = [[index, length - 1] for index, length in enumerate(lengths_)]
                     feed = {
                         essays:     essays_,
@@ -64,17 +64,18 @@ with tf.device("/gpu:0"):
                         keep_prob:  0.5
                     }
                     loss_, state, _ = sess.run([loss_hist, final_states, optimizer], feed_dict=feed)
-                    get_batches_time = batch_time + time.time()
+                    get_batches_time = batch_time + time.time() - get_batches_time
                     get_batches_time = time.gmtime(get_batches_time)
-                    print("sess run Time: {}min {}sec...".format(get_batches_time.tm_min, get_batches_time.tm_sec))
+                    print("sess run Time: {}sec...".format(get_batches_time.tm_sec))
                     batch_time = -time.time()
                     if _index % 20 == 0:
-                        train_writer.add_summary(loss_)
+                        train_writer.add_summary(loss_, _index)
 
                 now_time += time.time()
                 now_time = time.gmtime(now_time)
                 print("Epoch: {}/{}...\n".format(e + 1, epochs),
                       "Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
+                train_writer.close()
 
             # test
             now_time = -time.time()
@@ -94,8 +95,6 @@ with tf.device("/gpu:0"):
             now_time += time.time()
             now_time = time.gmtime(now_time)
             print("Test Time: {}hour {}min {}sec...".format(now_time.tm_hour, now_time.tm_min, now_time.tm_sec))
+            test_writer.close()
 
             saver.save(sess, "logic_models/" + str(start_time))
-
-            train_writer.close()
-            test_writer.close()
