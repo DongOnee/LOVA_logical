@@ -181,7 +181,7 @@ def parallelize_dataframe(train_or_valid="train", batch_size=100):
             pool.join()
             # print(ret)
             for sibal in ret:
-                print(sibal)
+                print("t"+sibal)
                 essays_.append(sibal[0])
                 lengths_.append(sibal[1])
                 scores_.append(sibal[2])
