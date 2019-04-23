@@ -32,7 +32,7 @@ with tf.device("/gpu:0"):
     with tf.Graph().as_default():
         # modeling
         essays, lengths, indice, scores, keep_prob, batch_size = model_inputs()
-        outputs = build_lstm_layers(essays, lengths, lstm_size, keep_prob, batch_size)
+        outputs = build_lstm_layers(essays, lengths, lstm_size, keep_prob, batch_size_)
         predictions, losses, optimizer = build_cost_fn_and_opt(outputs, indice, scores, learning_rate, lstm_size[-1])
 
         # to Tensorboard, saver
@@ -59,7 +59,6 @@ with tf.device("/gpu:0"):
                         lengths:    lengths_,
                         indice:     essay_indice,
                         scores:     [[score] for score in scores_],
-                        batch_size: batch_size_,
                         keep_prob:  0.5
                     }
                     loss_, _ = sess.run([loss_hist, optimizer], feed_dict=feed)
@@ -86,7 +85,6 @@ with tf.device("/gpu:0"):
                     lengths:    lengths_,
                     indice:     essay_indice,
                     scores:     [[score] for score in scores_],
-                    batch_size: batch_size_,
                     keep_prob:  1
                 }
                 loss_ = sess.run(loss_hist, feed_dict=feed)
