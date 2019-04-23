@@ -32,7 +32,7 @@ with tf.device("/gpu:0"):
     with tf.Graph().as_default():
         # modeling
         essays, lengths, indice, scores, keep_prob, batch_size = model_inputs()
-        outputs = build_lstm_layers(essays, lengths, lstm_size, keep_prob)
+        outputs = build_lstm_layers(essays, lengths, lstm_size, keep_prob, batch_size)
         predictions, losses, optimizer = build_cost_fn_and_opt(outputs, indice, scores, learning_rate, lstm_size[-1])
 
         # to Tensorboard, saver
