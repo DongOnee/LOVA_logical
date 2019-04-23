@@ -14,11 +14,12 @@ def model_inputs():
     lens_ = tf.placeholder(tf.int32, [None], name='essay_lengths')
     indice_ = tf.placeholder(tf.int32, [None, 2], name='indice')
     keep_prob_ = tf.placeholder(tf.float32, name='keep_prob')
+    batch_size_ = tf.placeholder(tf.int32, name='keep_prob')
 
-    return inputs_, lens_, indice_, scores_, keep_prob_
+    return inputs_, lens_, indice_, scores_, keep_prob_, batch_size_
 
 
-def build_lstm_layers(sentences, sentences_length, hidden_layer, keep_prob_):
+def build_lstm_layers(sentences, sentences_length, hidden_layer, keep_prob_, batch_size):
     """
     Create the LSTM layers
     :parm "sentences"   : sentences [batchsize, max_len, ???]
@@ -28,12 +29,12 @@ def build_lstm_layers(sentences, sentences_length, hidden_layer, keep_prob_):
     fw_cells = [tf.contrib.rnn.LSTMCell(layer, name='basic_lstm_cell') for layer in hidden_layer]
     fw_drops = [tf.contrib.rnn.DropoutWrapper(lstm, output_keep_prob=keep_prob_) for lstm in fw_cells]
     fw_stacked_cell = tf.contrib.rnn.MultiRNNCell(fw_drops)
-    fw_init_state = fw_stacked_cell.zero_state(tf.shape(sentences)[0], tf.float32)
+    fw_init_state = fw_stacked_cell.zero_state(batch_size, tf.float32)
 
     bw_cells = [tf.contrib.rnn.LSTMCell(layer, name='basic_lstm_cell') for layer in hidden_layer]
     bw_drops = [tf.contrib.rnn.DropoutWrapper(lstm, output_keep_prob=keep_prob_) for lstm in bw_cells]
     bw_stacked_cell = tf.contrib.rnn.MultiRNNCell(bw_drops)
-    bw_init_state = bw_stacked_cell.zero_state(tf.shape(sentences)[0], tf.float32)
+    bw_init_state = bw_stacked_cell.zero_state(batch_size, tf.float32)
 
     outputs, states = tf.nn.bidirectional_dynamic_rnn(fw_stacked_cell, bw_stacked_cell, sentences,
                                                       sequence_length=sentences_length,
