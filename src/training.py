@@ -15,7 +15,7 @@ args = parser.parse_args()
 # Hyper params
 lstm_size = [512, 256]
 epochs = args.epochs
-learning_rate = 0.4
+learning_rate = 0.001
 batch_size_ = 100
 
 print('#' * 5, "LSTM Cell Size  :", lstm_size)
@@ -42,10 +42,10 @@ with tf.device("/gpu:0"):
             sess.run(tf.global_variables_initializer())
 
             # train
+            train_writer = tf.summary.FileWriter('board/train-' + str(start_time), sess.graph)
             for e in range(epochs):
                 now_time = -time.time()
                 # batch_time = -time.time()
-                train_writer = tf.summary.FileWriter('board/train-'+str(e)+'-'+str(start_time), sess.graph)
                 for _index, (essays_, lengths_, scores_) in enumerate(parallelize_dataframe(batch_size=batch_size_), 1):
                     # get_batches_time = batch_time + time.time()
                     # get_batches_time = time.gmtime(get_batches_time)
@@ -71,7 +71,7 @@ with tf.device("/gpu:0"):
                 now_time = time.gmtime(now_time)
                 print("Epoch: {}/{}\t".format(e + 1, epochs),
                       "Time: {}min {}sec".format(now_time.tm_min, now_time.tm_sec))
-                train_writer.close()
+            train_writer.close()
 
             # test
             now_time = -time.time()
