@@ -55,7 +55,7 @@ def build_cost_fn_and_opt(lstm_outputs, indice,  scores_, learning_rate, n_hidde
     outputs_fw = tf.gather_nd(lstm_outputs[0], indice)
     outputs_bw = tf.gather_nd(lstm_outputs[1], indice)
     outputs_concat = tf.concat([outputs_fw, outputs_bw], axis=1)
-    weights = tf.Variable(tf.random_normal([n_hidden * 2], seed=10))
+    weights = tf.Variable(tf.random_normal([n_hidden * 2, 1], seed=10))
     bias = tf.Variable(tf.random_normal([1], seed=10))
     predictions = tf.matmul(outputs_concat, weights) + bias
 
