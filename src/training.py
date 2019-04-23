@@ -7,21 +7,17 @@ import time
 ###############
 # argument
 parser = argparse.ArgumentParser()
-parser.add_argument("-s", "--step", dest="step", type=int, metavar='<int>', default=5,
-                    help="saver global step number (default=5)")
 parser.add_argument("-e", "--epochs", dest="epochs", type=int, metavar='<int>', default=5,
-                    help="Number of epochs (default=5)")
+                    help="Number of epochs (default=4)")
 args = parser.parse_args()
 
 ###############
 # Hyper params
-global_step = args.step
 lstm_size = [512, 256]
 epochs = args.epochs
 learning_rate = 0.4
 batch_size_ = 100
 
-print('#' * 5, "Global Step     :", global_step)
 print('#' * 5, "LSTM Cell Size  :", lstm_size)
 print('#' * 5, "Epochs          :", epochs)
 print('#' * 5, "Learning Rate   :", learning_rate)
