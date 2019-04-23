@@ -9,7 +9,7 @@ def model_inputs():
     """
     Create the model inputs
     """
-    inputs_ = tf.placeholder(tf.float32, [None, None, None], name='essays')
+    inputs_ = tf.placeholder(tf.float32, [None, 100, 1024], name='essays')
     scores_ = tf.placeholder(tf.float32, [None, 1], name='scores')
     lens_ = tf.placeholder(tf.int32, [None], name='essay_lengths')
     indice_ = tf.placeholder(tf.int32, [None, 2], name='indice')
