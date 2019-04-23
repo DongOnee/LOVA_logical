@@ -34,7 +34,8 @@ def build_lstm_layers(sentences, sentences_length, hidden_layer, keep_prob_):
     bw_stacked_cell = tf.contrib.rnn.MultiRNNCell(bw_drops)
 
     outputs, _ = tf.nn.bidirectional_dynamic_rnn(fw_stacked_cell, bw_stacked_cell, sentences,
-                                                 sequence_length=sentences_length)
+                                                 sequence_length=sentences_length,
+                                                 dtype=tf.float32)
 
     return outputs
 
