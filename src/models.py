@@ -57,6 +57,8 @@ def build_cost_fn_and_opt(lstm_outputs, indice,  scores_, learning_rate, n_hidde
     weights = tf.Variable(tf.random_normal([n_hidden * 2, 1], seed=10))
     bias = tf.Variable(tf.random_normal([1], seed=10))
     predictions = tf.matmul(outputs_concat, weights) + bias
+    predictions = tf.identity(predictions, name="predictions")
+
 
     loss = tf.losses.mean_squared_error(scores_, predictions)
     # loss = tf.reduce_sum(tf.square(predictions - scores_))
