@@ -28,17 +28,19 @@ def build_lstm_layers(sentences, sentences_length, hidden_layer, keep_prob_, bat
     fw_cells = [tf.contrib.rnn.LSTMCell(layer, name='basic_lstm_cell') for layer in hidden_layer]
     fw_drops = [tf.contrib.rnn.DropoutWrapper(lstm, output_keep_prob=keep_prob_) for lstm in fw_cells]
     fw_stacked_cell = tf.contrib.rnn.MultiRNNCell(fw_drops)
-    fw_init_state = fw_stacked_cell.zero_state(batch_size, tf.float32)
+    # fw_init_state = fw_stacked_cell.zero_state(batch_size, tf.float32)
 
     bw_cells = [tf.contrib.rnn.LSTMCell(layer, name='basic_lstm_cell') for layer in hidden_layer]
     bw_drops = [tf.contrib.rnn.DropoutWrapper(lstm, output_keep_prob=keep_prob_) for lstm in bw_cells]
     bw_stacked_cell = tf.contrib.rnn.MultiRNNCell(bw_drops)
-    bw_init_state = bw_stacked_cell.zero_state(batch_size, tf.float32)
+    # bw_init_state = bw_stacked_cell.zero_state(batch_size, tf.float32)
 
-    outputs, states = tf.nn.bidirectional_dynamic_rnn(fw_stacked_cell, bw_stacked_cell, sentences,
-                                                      sequence_length=sentences_length,
-                                                      initial_state_fw=fw_init_state,
-                                                      initial_state_bw=bw_init_state)
+    outputs, _ = tf.nn.bidirectional_dynamic_rnn(fw_stacked_cell, bw_stacked_cell, sentences,
+                                                    sequence_length=sentences_length, dtype=tf.float32)
+                                                    #   ,
+                                                    #   initial_state_fw=fw_init_state,
+                                                    #   initial_state_bw=bw_init_state)
+    outputs = tf.identity(outputs, name="outputs")
 
     return outputs
 
