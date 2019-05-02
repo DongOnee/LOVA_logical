@@ -1,49 +1,56 @@
-from embedding import *
+import time, sys, os, json
 import tensorflow as tf
-import argparse
-import time
-from nltk.tokenize import sent_tokenize
+import pymongo
+from bson.objectid import ObjectId
+from embedding import *
 
+# modify current working directory
+os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-e", "--essay-path", dest="essay", type=str, metavar='<str>', required=True,
-                    help="The path to the essay")
-parser.add_argument("-s", "--step", dest="step", type=str, metavar='<str>', default="5",
-                    help="saver global step number (default=5)")
-args = parser.parse_args()
+# init..?
+essayId = sys.argv[1]
+modelDirPath = 'logic_models'
+_start_tm = time.time()
+ret = dict()
+ret['result'] = 0
 
-start_time = time.time()
-essay_path = args.essay
-model_dir = "logic_models"
-global_step = args.step
-meta_path = model_dir + "/dongs-"+global_step+".meta"
+# load essay MongoDB
+conn = pymongo.MongoClient('localhost')
+db = conn.get_database('mongodb_tutorial')
+essayCollection = db.get_collection('essays')
+try:
+    result = essayCollection.find({"_id": ObjectId(essayId)})[0]
+except IndexError:
+    print(json.dumps(ret))
+    exit(0)
 
-with open(essay_path, 'r') as f:
-    input_essay = f.read()
+ret['result'] = 1
+inputEssay, length_essay = embedding_parag(result.get('paragraph', 'Hi~'))
+inputOpinion = result.get('opinion', 'Hi~')
+nameAuthor = result.get('author', 'customer')
 
-input_essay = [sent_tokenize(input_essay)]
+checkpoint_file = tf.train.latest_checkpoint(modelDirPath)
 
-vector_essay, length_essay = embedding_parag(input_essay)
-
-with tf.Graph().as_default():
-    saver = tf.train.import_meta_graph(meta_path)
+graph_ = tf.Graph()
+with graph_.as_default():
     with tf.Session() as sess:
-        saver.restore(sess, tf.train.latest_checkpoint(model_dir))
-        graph_ = tf.get_default_graph()
-        res = graph_.get_tensor_by_name("result:0")
-        i = graph_.get_tensor_by_name('inputs:0')
-        l = graph_.get_tensor_by_name('lengths:0')
-        lp = graph_.get_tensor_by_name('lengths_pad:0')
+        saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
+        saver.restore(sess, checkpoint_file)
+
+        res = graph_.get_tensor_by_name("predictions:0")
+        i = graph_.get_tensor_by_name('essays:0')
+        l = graph_.get_tensor_by_name('essay_lengths:0')
+        lp = graph_.get_tensor_by_name('indice:0')
         kp = graph_.get_tensor_by_name('keep_prob:0')
-        bs = graph_.get_tensor_by_name('batch_size:0')
+
         siba = sess.run(res, feed_dict={
-            i: vector_essay,
-            l: length_essay,
-            lp: [[0, length_essay[0]]],
+            i: [inputEssay],
+            l: [length_essay],
+            lp: [[0, length_essay-1]],
             kp: 1,
-            bs: 1
         })
 
-print(siba[0][0])
-run_time = time.gmtime(time.time()-start_time)
-print("{} min {} sec".format(run_time.tm_min, run_time.tm_sec))
+_running_tm = time.gmtime(time.time()-_start_tm)
+ret['score'] = siba[0][0] * 100
+ret['time'] = time.time()-_start_tm
+print(json.dumps(ret))
