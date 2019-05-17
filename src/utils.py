@@ -1,30 +1,16 @@
-import numpy as np
-from nltk.tokenize import sent_tokenize
-import tensorflow as tf
 import pandas as pd
-from ast import literal_eval
 import glob
 from multiprocessing import Pool
-import os
-
-asap_ranges = {
-    0: (0, 60),
-    1: (2, 12),
-    2: (1, 6),
-    3: (0, 3),
-    4: (0, 3),
-    5: (0, 4),
-    6: (0, 4),
-    7: (0, 30),
-    8: (0, 60)
-}
-
-dataPath = ['../data/training_set_rel3.tsv',
-            '../data/valid_set.tsv',
-            '../data/valid_sample_submission_2_column.csv']
+import tensorflow as tf
+from models import embedding_layer
 
 
-def get_batches5(train_or_valid="train", batch_size=100):
+def get_batches(train_or_valid="train", batch_size=100):
+    """
+    :param train_or_valid: to select train data or valid data
+    :param batch_size: slice batchsize
+    :return: yield method essays, lengths, scores
+    """
     filepaths = glob.glob("../preproc3/"+train_or_valid+"_preproc_*")
 
     essays, lengths, scores = list(), list(), list()
@@ -32,8 +18,8 @@ def get_batches5(train_or_valid="train", batch_size=100):
         tmp = pd.read_csv(filepath).values
         x = tmp[:100]
         essays.append(x)
-        len = tmp[-1, 0]
-        lengths.append(len)
+        length = tmp[-1, 0]
+        lengths.append(length)
         y = tmp[-1, 1]
         del [[tmp]]
         scores.append(y)
@@ -45,6 +31,12 @@ def get_batches5(train_or_valid="train", batch_size=100):
 
 
 def parallelize_dataframe(train_or_valid="train", batch_size=100):
+    """
+    USE MULTIPROCESSING
+    :param train_or_valid: to select train data or valid data
+    :param batch_size: slice batchsize
+    :return: yield method essays, lengths, scores
+    """
     num_cores = 10
 
     filepaths = glob.glob("../preproc3/" + train_or_valid + "_preproc_*")
@@ -70,3 +62,26 @@ def parallelize_dataframe(train_or_valid="train", batch_size=100):
 def load_data(preproc_path):
     df = pd.read_csv(preproc_path).values
     return df[:100], df[-1, 0], df[-1, 1]
+
+
+def embedding_parag(input_paragraphs):
+    """
+    :param input_paragraphs: list of paragraphs
+    :return: list of preprocessed paragraphs, list of number of paragraphs
+    """
+
+    preprocessed, sentence_len = list(), list()
+
+    with tf.device("/gpu:0"):
+        with tf.Graph().as_default():
+            sentences, embeddings = embedding_layer()
+            with tf.Session() as sess:
+                for paragraph in input_paragraphs:
+                    length = len(paragraph)
+                    sentence_len.append(length)
+                    sentence_rep = sess.run(embeddings, feed_dict={sentences: paragraph})
+                    pad = [[0] * 1024]*100
+                    pad[:length] = sentence_rep.tolist()
+                    preprocessed.append(pad)
+
+    return preprocessed, sentence_len

@@ -1,8 +1,16 @@
 import tensorflow as tf
+import tensorflow_hub as hub
 
 ########################
 # Model 1
 #
+
+
+def embedding_layer():
+    input_sent = tf.placeholder(tf.string, [None], name='input')
+    elmo_module = hub.Module("https://tfhub.dev/google/elmo/2", trainable=False)
+    embedding = elmo_module(input_sent, signature="default", as_dict=True)['default']
+    return input_sent, embedding
 
 
 def model_inputs():

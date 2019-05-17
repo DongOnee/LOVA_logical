@@ -1,9 +1,15 @@
 # LOVA_logical
 Hanyang Univ.
 
+
+2019.5.16. dong's ver 4.0
+----
+- src/embedding.py
+    - 
+
 2019.4.3. dong's ver3.0
 ----
-> training 하는 과정에서 데이터를 전처리 하는데 오랜 시간이 걸리는걸 확인 하였다<br>
+> training 하는 과정에서 데이터를 전처리 하는데 오랜 시간이 걸리는걸 확인 하였다.<br>
 > 이 부분을 해결 하기 위해 모든 데이터에 대해서 전처리를 해놓고 학습 시킬때 불러오는 식으로 하기로 하였다.
 
 - src/train.py
