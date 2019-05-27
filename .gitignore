@@ -1,7 +1,6 @@
 *.pyc
 *.pckl
 data/*
-preproc*
 log*
 .ipynb_checkpoints
 src/board/*

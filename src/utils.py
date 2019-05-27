@@ -3,6 +3,7 @@ import glob
 from multiprocessing import Pool
 import tensorflow as tf
 from models import embedding_layer
+from nltk.tokenize import sent_tokenize
 
 
 def get_batches(train_or_valid="train", batch_size=100):
@@ -69,14 +70,15 @@ def embedding_parag(input_paragraphs):
     :param input_paragraphs: list of paragraphs
     :return: list of preprocessed paragraphs, list of number of paragraphs
     """
-
     preprocessed, sentence_len = list(), list()
 
     with tf.device("/gpu:0"):
         with tf.Graph().as_default():
             sentences, embeddings = embedding_layer()
             with tf.Session() as sess:
+                sess.run(tf.global_variables_initializer())
                 for paragraph in input_paragraphs:
+                    paragraph = sent_tokenize(paragraph)
                     length = len(paragraph)
                     sentence_len.append(length)
                     sentence_rep = sess.run(embeddings, feed_dict={sentences: paragraph})
